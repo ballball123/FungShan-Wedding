@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>荒山映像 婚禮攝影開會紀錄 | Wedding Call Sheet</title>
+  <title>荒山映像 婚禮攝影 | Wedding Call Sheet</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -114,7 +114,7 @@
           荒山映像
         </span>
         <h1 class="font-black text-sm sm:text-base tracking-tight text-zinc-900 dark:text-white truncate">
-          荒山映像 婚禮攝影開會紀錄
+          荒山映像 婚禮攝影
         </h1>
       </div>
       <span class="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 shrink-0 hidden sm:inline">
@@ -564,7 +564,7 @@
 
   <script>
     // ==========================================
-    // 0. 香港主要婚禮酒店分區清單 (HK WEDDING HOTELS)
+    // 0. 香港主要婚禮酒店與教堂清單
     // ==========================================
     const HK_HOTELS_BY_REGION = [
       {
@@ -774,7 +774,7 @@
         label: 'DECO (場地佈置)',
         mode: 'single',
         options: ['有DECO', '場地基本佈置', 'N/A'],
-        placeholder: 'DECO 公司或備註'
+        placeholder: 'DECO 公司/備註'
       },
       weddingCar: {
         label: '花車 (Wedding Car)',
@@ -877,10 +877,10 @@
         placeholder: '其他證婚環節'
       },
       banquetHighlights: {
-        label: '22. 晚宴/派對特別環節 (Banquet Highlights)',
+        label: '22. 午宴或晚宴特別環節 (Banquet Highlights)',
         mode: 'multi',
         options: ['切蛋糕 CAKE', '致辭 SPEECH', '送花給父母', '敬酒 Toasting', '播成長片段', '播早拍晚播 SDE', '玩遊戲', 'Live Band'],
-        placeholder: '其他晚宴環節'
+        placeholder: '其他午宴或晚宴環節'
       }
     };
 
@@ -1728,15 +1728,15 @@
 
       // 檢查低分家庭關係警告 (已移除冇車位頂部警示)
       const warnings = [];
-      if (rec.brideParentsRel <= 5) warnings.push(`⚠️ 女家父母關係 ${rec.brideParentsRel}/10`);
-      if (rec.brideSelfParentsRel <= 5) warnings.push(`⚠️ 新娘與父母 ${rec.brideSelfParentsRel}/10`);
-      if (rec.groomParentsRel <= 5) warnings.push(`⚠️ 男家父母關係 ${rec.groomParentsRel}/10`);
-      if (rec.groomSelfParentsRel <= 5) warnings.push(`⚠️ 新郎與父母 ${rec.groomSelfParentsRel}/10`);
+      if (rec.brideParentsRel <= 5) warnings.push(`女家父母關係 ${rec.brideParentsRel}/10`);
+      if (rec.brideSelfParentsRel <= 5) warnings.push(`新娘與父母 ${rec.brideSelfParentsRel}/10`);
+      if (rec.groomParentsRel <= 5) warnings.push(`男家父母關係 ${rec.groomParentsRel}/10`);
+      if (rec.groomSelfParentsRel <= 5) warnings.push(`新郎與父母 ${rec.groomSelfParentsRel}/10`);
       if ((rec.brideParentsStatus?.selected || []).some(s => s.includes('ONLY') || s.includes('離婚'))) {
-        warnings.push(`⚠️ 女家：${rec.brideParentsStatus.selected.join('/')}`);
+        warnings.push(`女家：${rec.brideParentsStatus.selected.join('/')}`);
       }
       if ((rec.groomParentsStatus?.selected || []).some(s => s.includes('ONLY') || s.includes('離婚'))) {
-        warnings.push(`⚠️ 男家：${rec.groomParentsStatus.selected.join('/')}`);
+        warnings.push(`男家：${rec.groomParentsStatus.selected.join('/')}`);
       }
 
       const warningBannerHtml = warnings.length > 0 ? `
@@ -1786,9 +1786,9 @@
       };
 
       const html = `
-        <!-- 1. 頂部標題欄 (荒山映像放大字體、移除 CALL SHEET、右上角標註製作日期及時間) -->
+        <!-- 1. 頂部標題欄 (荒山映像放大字體、右上角標註製作日期及時間) -->
         <div class="bg-zinc-900 text-white p-4">
-          <div class="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-zinc-800">
+          <div class="flex items-baseline justify-between gap-2 pb-2.5 mb-2.5 border-b border-zinc-800">
             <div class="text-xl sm:text-2xl tracking-wider text-orange-400 font-black">荒山映像</div>
             <div class="text-[11px] sm:text-xs font-bold text-zinc-400 text-right">
               製作日期及時間：<span class="text-zinc-200 font-extrabold">${escapeHtml(formatDateTimeZh(rec.updatedAt || Date.now()))}</span>
@@ -1799,7 +1799,7 @@
             <div class="min-w-0">
               <h1 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight break-words">${escapeHtml(rec.coupleName || '未命名新人')}</h1>
               <div class="text-sm font-bold text-zinc-300 mt-1 flex flex-wrap items-center gap-x-2">
-                <span>📅 ${escapeHtml(rec.weddingDate || '未定日期')}</span>
+                <span>日期：${escapeHtml(rec.weddingDate || '未定日期')}</span>
                 <span class="text-orange-400 font-extrabold">${escapeHtml(weekday)}</span>
               </div>
             </div>
@@ -1810,10 +1810,10 @@
               </span>
               <div class="flex flex-col items-end gap-1">
                 <span class="px-2.5 py-0.5 rounded-lg bg-zinc-800 border border-rose-500/50 text-rose-300 font-extrabold text-xs">
-                  ⏰ 出門吉時：${escapeHtml(leaveTimeText)}
+                  出門吉時：${escapeHtml(leaveTimeText)}
                 </span>
                 <span class="px-2.5 py-0.5 rounded-lg bg-zinc-800 border border-sky-500/50 text-sky-300 font-extrabold text-xs">
-                  ⏰ 入門吉時：${escapeHtml(enterTimeText)}
+                  入門吉時：${escapeHtml(enterTimeText)}
                 </span>
               </div>
             </div>
@@ -1844,7 +1844,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-3">
             <div class="rounded-2xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-200 dark:border-rose-900/50 p-3.5">
               <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-extrabold text-rose-700 dark:text-rose-400">📍 出門地點 (女家)</span>
+                <span class="text-xs font-extrabold text-rose-700 dark:text-rose-400">出門地點 (女家)</span>
                 ${renderCopyBtn(brideLocText, '女家出門地址')}
               </div>
               <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white whitespace-pre-line leading-snug">${escapeHtml(brideLocText)}</div>
@@ -1852,7 +1852,7 @@
 
             <div class="rounded-2xl bg-sky-50/80 dark:bg-sky-950/25 border border-sky-200 dark:border-sky-900/50 p-3.5">
               <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-extrabold text-sky-700 dark:text-sky-400">📍 入門地點 (男家)</span>
+                <span class="text-xs font-extrabold text-sky-700 dark:text-sky-400">入門地點 (男家)</span>
                 ${renderCopyBtn(groomLocText, '男家入門地址')}
               </div>
               <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white whitespace-pre-line leading-snug">${escapeHtml(groomLocText)}</div>
@@ -1860,7 +1860,7 @@
 
             <div class="rounded-2xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 p-3.5">
               <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400">💍 證婚場地</span>
+                <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400">證婚場地</span>
                 ${renderCopyBtn(ceremonyText, '證婚場地')}
               </div>
               <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white leading-snug">${escapeHtml(ceremonyText)}</div>
@@ -1868,7 +1868,7 @@
 
             <div class="rounded-2xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 p-3.5">
               <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400">🥂 宴會場地及圍數</span>
+                <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400">宴會場地及圍數</span>
                 ${renderCopyBtn(banquetText, '宴會場地')}
               </div>
               <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white leading-snug">${escapeHtml(banquetText)}</div>
@@ -1878,11 +1878,11 @@
           <!-- 花車與交通 (手機直向清晰分行) -->
           <div class="rounded-2xl bg-zinc-100/90 dark:bg-zinc-800/90 p-3.5 space-y-2 text-sm">
             <div class="flex items-start gap-2">
-              <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">🚘 花車：</span>
+              <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">花車：</span>
               <span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.weddingCar))}</span>
             </div>
             <div class="flex items-start gap-2 pt-1.5 border-t border-zinc-200/80 dark:border-zinc-700">
-              <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">🚐 交通：</span>
+              <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">交通：</span>
               <span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.transport))}</span>
             </div>
           </div>
@@ -1937,7 +1937,7 @@
               <!-- 女家欄 -->
               <div id="sum-card-bride" class="rounded-2xl border-2 border-rose-200 dark:border-rose-900/60 overflow-hidden">
                 <div class="bg-rose-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
-                  <span>👰 女家 (BRIDE)</span>
+                  <span>女家 (BRIDE)</span>
                   <span class="bg-black/20 px-2 py-0.5 rounded text-xs">敬茶：${escapeHtml(formatHybrid(rec.brideTeaSets))}</span>
                 </div>
                 <div class="p-3.5 space-y-2 text-sm bg-rose-50/40 dark:bg-rose-950/15">
@@ -1955,7 +1955,7 @@
               <!-- 男家欄 -->
               <div id="sum-card-groom" class="rounded-2xl border-2 border-sky-200 dark:border-sky-900/60 overflow-hidden">
                 <div class="bg-sky-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
-                  <span>🤵 男家 (GROOM)</span>
+                  <span>男家 (GROOM)</span>
                   <span class="bg-black/20 px-2 py-0.5 rounded text-xs">敬茶：${escapeHtml(formatHybrid(rec.groomTeaSets))}</span>
                 </div>
                 <div class="p-3.5 space-y-2 text-sm bg-sky-50/40 dark:bg-sky-950/15">
@@ -1974,7 +1974,7 @@
 
           ${rec.familyRemark && rec.familyRemark.trim() ? `
             <div class="rounded-2xl bg-amber-50 dark:bg-amber-950/35 border border-amber-300 dark:border-amber-800 p-3.5 text-sm">
-              <span class="font-extrabold text-amber-800 dark:text-amber-300 block mb-0.5">⚠️ 家庭特別備註：</span>
+              <span class="font-extrabold text-amber-800 dark:text-amber-300 block mb-0.5">家庭特別備註：</span>
               <span class="font-bold text-zinc-900 dark:text-white">${escapeHtml(rec.familyRemark)}</span>
             </div>
           ` : ''}
@@ -1985,28 +1985,28 @@
 
             <div class="space-y-3 text-sm">
               <div>
-                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">🌅 早上環節</span>
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">早上環節</span>
                 <div class="flex flex-wrap gap-1.5">
                   ${morningItems.length > 0
-                    ? morningItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">☑ ${escapeHtml(i)}</span>`).join('')
+                    ? morningItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">${escapeHtml(i)}</span>`).join('')
                     : '<span class="text-zinc-400 text-xs">無特別指定</span>'}
                 </div>
               </div>
 
               <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">💒 證婚儀式</span>
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">證婚儀式</span>
                 <div class="flex flex-wrap gap-1.5">
                   ${ceremonyItems.length > 0
-                    ? ceremonyItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">☑ ${escapeHtml(i)}</span>`).join('')
+                    ? ceremonyItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">${escapeHtml(i)}</span>`).join('')
                     : '<span class="text-zinc-400 text-xs">無特別指定</span>'}
                 </div>
               </div>
 
               <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">🎉 晚宴環節</span>
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">午宴或晚宴環節</span>
                 <div class="flex flex-wrap gap-1.5">
                   ${banquetItems.length > 0
-                    ? banquetItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">☑ ${escapeHtml(i)}</span>`).join('')
+                    ? banquetItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">${escapeHtml(i)}</span>`).join('')
                     : '<span class="text-zinc-400 text-xs">無特別指定</span>'}
                 </div>
               </div>
@@ -2015,7 +2015,7 @@
 
           ${rec.generalNotes && rec.generalNotes.trim() ? `
             <div class="rounded-2xl bg-zinc-900 text-white p-4 text-sm">
-              <div class="text-xs font-extrabold uppercase tracking-wider text-orange-400 mb-1">📌 攝影師全日特別備註 / MUST-SHOT</div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-orange-400 mb-1">攝影師全日特別備註 / MUST-SHOT</div>
               <div class="whitespace-pre-line font-semibold leading-relaxed">${escapeHtml(rec.generalNotes)}</div>
             </div>
           ` : ''}
@@ -2189,7 +2189,7 @@
         { header: '早上攝影環節', value: formatHybrid(rec.morningSession, '') },
         { header: '證婚進場', value: formatHybrid(rec.ceremonyMarchIn, '') },
         { header: '證婚儀式', value: formatHybrid(rec.ceremonyRituals, '') },
-        { header: '晚宴環節', value: formatHybrid(rec.banquetHighlights, '') },
+        { header: '午宴或晚宴環節', value: formatHybrid(rec.banquetHighlights, '') },
         { header: '全日特別備註', value: rec.generalNotes || '' }
       ];
 
@@ -2276,44 +2276,44 @@
       const enterTimeText = formatHybrid(rec.auspiciousEnterTime, '無吉時');
 
       const lines = [
-        `📸 *荒山映像 婚禮攝影開會紀錄*`,
-        `👰🤵 *新人*：${rec.coupleName || '未命名'}`,
-        `📅 *日期*：${rec.weddingDate || '未定'} ${weekday}`,
-        `📦 *方案*：${formatHybrid(rec.package)}`,
-        `⏰ *出門吉時*：${leaveTimeText}`,
-        `⏰ *入門吉時*：${enterTimeText}`,
+        `*荒山映像 婚禮攝影*`,
+        `*新人*：${rec.coupleName || '未命名'}`,
+        `*日期*：${rec.weddingDate || '未定'} ${weekday}`,
+        `*方案*：${formatHybrid(rec.package)}`,
+        `*出門吉時*：${leaveTimeText}`,
+        `*入門吉時*：${enterTimeText}`,
         ``,
-        `📍 *出門 (女家)*：${formatHybrid(rec.brideLocation)}`,
-        `📍 *入門 (男家)*：${formatHybrid(rec.groomLocation)}`,
-        `💍 *證婚場地*：${formatHybrid(rec.ceremonyVenue)}`,
-        `🥂 *宴會場地*：${formatHybrid(rec.banquetVenue)}`,
+        `*出門 (女家)*：${formatHybrid(rec.brideLocation)}`,
+        `*入門 (男家)*：${formatHybrid(rec.groomLocation)}`,
+        `*證婚場地*：${formatHybrid(rec.ceremonyVenue)}`,
+        `*宴會場地*：${formatHybrid(rec.banquetVenue)}`,
         ``,
-        `👥 *團隊與單位*`,
+        `*團隊與單位*`,
         `• 姊妹/兄弟：${formatHybrid(rec.bridesmaidsCount, '0')}姊妹 / ${formatHybrid(rec.groomsmenCount, '0')}兄弟`,
         `• Video：${formatHybrid(rec.videoTeam)} | MUA：${rec.mua || '-'}`,
         `• MC：${formatHybrid(rec.mc)} | 大妗：${formatHybrid(rec.daiKam)} | 律師：${formatHybrid(rec.celebrant)}`,
         `• 花車：${formatHybrid(rec.weddingCar)}`,
         ``,
-        `🍱 *膳食與車位*`,
+        `*膳食與車位*`,
         `• Lunch：${formatHybrid(rec.crewLunch)} | Dinner：${formatHybrid(rec.crewDinner)}`,
         `• 交通：${formatHybrid(rec.transport)} | 車位：${formatHybrid(rec.parking)}`,
         ``,
-        `👰 *女家細節*`,
+        `*女家細節*`,
         `• 服裝：${formatHybrid(rec.brideAttire)} | 敬茶：${formatHybrid(rec.brideTeaSets)}`,
         `• 家庭：${formatHybrid(rec.brideParentsStatus)} (父母間 ${rec.brideParentsRel}/10, 女與父母 ${rec.brideSelfParentsRel}/10)`,
         `• 兄弟姊妹：${formatSiblingsSummary(rec, 'bride')} | 祖父母：${formatHybrid(rec.brideGrandparents)}`,
         ``,
-        `🤵 *男家細節*`,
+        `*男家細節*`,
         `• 服裝：${formatHybrid(rec.groomAttire)} | 敬茶：${formatHybrid(rec.groomTeaSets)}`,
         `• 家庭：${formatHybrid(rec.groomParentsStatus)} (父母間 ${rec.groomParentsRel}/10, 仔與父母 ${rec.groomSelfParentsRel}/10)`,
         `• 兄弟姊妹：${formatSiblingsSummary(rec, 'groom')} | 祖父母：${formatHybrid(rec.groomGrandparents)}`,
-        rec.familyRemark ? `⚠️ *家庭備註*：${rec.familyRemark}` : '',
+        rec.familyRemark ? `*家庭備註*：${rec.familyRemark}` : '',
         ``,
-        `🎬 *拍攝環節*`,
+        `*拍攝環節*`,
         `• 早上：${formatHybrid(rec.morningSession)}`,
         `• 證婚：${formatHybrid(rec.ceremonyMarchIn)} / ${formatHybrid(rec.ceremonyRituals)}`,
-        `• 晚宴：${formatHybrid(rec.banquetHighlights)}`,
-        rec.generalNotes ? `📌 *特別備註*：${rec.generalNotes}` : ''
+        `• 午宴或晚宴：${formatHybrid(rec.banquetHighlights)}`,
+        rec.generalNotes ? `*特別備註*：${rec.generalNotes}` : ''
       ].filter((line, i, arr) => !(line === '' && arr[i - 1] === ''));
 
       copyQuickText(lines.join('\n'), ' WhatsApp 團隊文字版');
