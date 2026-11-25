@@ -1,754 +1,2463 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="屋企資訊站" />
-  <link rel="manifest" href="manifest.json" />
-  <title>屋企資訊站 // 沙田愉翠苑終端</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>荒山映像 婚禮攝影開會紀錄 | Wedding Call Sheet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          },
+          colors: {
+            pro: {
+              bg: '#F7F6F2',
+              card: '#FFFFFF',
+              darkBg: '#121316',
+              darkCard: '#1C1E24',
+              darkBorder: '#2C303A',
+              accent: '#EA580C', // 亮橙色強調重點
+              accentHover: '#C2410C',
+              warn: '#DC2626',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+TC:wght@400;700&display=swap');
-
-    :root {
-      --bg-color: #050505;
-      --panel-bg: #0f0d0a;
-      --amber: #ff7a00;
-      --amber-bright: #ffa84d;
-      --amber-dim: #5c2c00;
-      --amber-glow: rgba(255, 122, 0, 0.35);
-      --border-color: #3d1d00;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
     body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-color);
-      color: var(--amber);
-      font-family: 'Share Tech Mono', 'Noto Sans TC', monospace;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
+      font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
     }
-
-    /* 復古 CRT 掃描線 */
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-      background-size: 100% 4px;
-      pointer-events: none;
-      z-index: 999;
+    /* 防止手機瀏覽器點擊 input/select/textarea 時自動放大畫面 (需 >= 16px) */
+    @media (max-width: 640px) {
+      input[type="text"],
+      input[type="date"],
+      input[type="number"],
+      textarea,
+      select {
+        font-size: 16px !important;
+      }
     }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      border-bottom: 2px solid var(--border-color);
-      background: #080604;
-    }
-
-    .sys-title {
-      font-size: 14px;
-      letter-spacing: 1.5px;
-      text-shadow: 0 0 8px var(--amber-glow);
-    }
-
-    .live-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      border: 1px solid var(--amber);
-      padding: 2px 8px;
-      border-radius: 3px;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      background-color: var(--amber);
-      border-radius: 50%;
-      box-shadow: 0 0 6px var(--amber);
-      animation: blink 1.5s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px;
-      position: relative;
-    }
-
-    .page {
+    /* 隱藏橫向捲動條但保留滑動功能 */
+    .no-scrollbar::-webkit-scrollbar {
       display: none;
-      animation: fadeIn 0.2s ease;
     }
-
-    .page.active {
-      display: block;
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* 自訂捲軸更整潔 */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
     }
-
-    .retro-box {
-      background: var(--panel-bg);
-      border: 1.5px solid var(--amber-dim);
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: inset 0 0 15px rgba(255, 122, 0, 0.05);
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.5);
+      border-radius: 9999px;
     }
-
-    .box-label {
-      font-size: 12px;
-      color: var(--amber-bright);
-      letter-spacing: 1.5px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px dashed var(--border-color);
-      padding-bottom: 4px;
-    }
-
-    /* 第一頁：天氣與時鐘 */
-    .clock-display {
-      font-size: 52px;
-      font-weight: bold;
-      text-align: center;
-      letter-spacing: 3px;
-      text-shadow: 0 0 14px var(--amber-glow);
-      margin: 4px 0;
-    }
-
-    .date-display {
-      text-align: center;
-      font-size: 14px;
-      color: var(--amber-bright);
-    }
-
-    .weather-main {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 10px 0;
-    }
-
-    .temp-big {
-      font-size: 60px;
-      font-weight: bold;
-      text-shadow: 0 0 15px var(--amber-glow);
-    }
-
-    .weather-stats {
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
-    .forecast-text {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #e68a2e;
-    }
-
-    /* 第二頁：沙田愉翠苑巴士報站器 */
-    .bus-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .btn-retro {
-      background: transparent;
-      color: var(--amber);
-      border: 1.5px solid var(--amber);
-      padding: 6px 12px;
-      font-family: inherit;
-      font-size: 13px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .btn-retro:active {
-      background: var(--amber);
-      color: #000;
-    }
-
-    .bus-filter-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .bus-search {
-      flex: 1;
-      background: #000;
-      border: 1px solid var(--amber-dim);
-      color: var(--amber);
-      padding: 8px 10px;
-      font-family: inherit;
-      font-size: 14px;
-      border-radius: 4px;
-      outline: none;
-    }
-
-    .bus-search:focus {
-      border-color: var(--amber);
-    }
-
-    .bus-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 11px 12px;
-      border: 1px solid var(--border-color);
-      background: #0c0a08;
-      margin-bottom: 8px;
-      border-radius: 5px;
-      position: relative;
-    }
-
-    .bus-row.pinned {
-      border-color: var(--amber);
-      background: #140f09;
-    }
-
-    .star-btn {
-      background: none;
-      border: none;
-      color: var(--amber-dim);
-      font-size: 18px;
-      padding: 0 8px 0 0;
-      cursor: pointer;
-    }
-
-    .star-btn.active {
-      color: var(--amber-bright);
-      text-shadow: 0 0 8px var(--amber);
-    }
-
-    .bus-route {
-      font-size: 26px;
-      font-weight: bold;
-      min-width: 68px;
-      text-shadow: 0 0 8px var(--amber-glow);
-    }
-
-    .bus-dest {
-      flex: 1;
-      padding: 0 8px;
-    }
-
-    .bus-dest-main {
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .bus-stop-sub {
-      font-size: 11px;
-      color: #b35900;
-      margin-top: 3px;
-    }
-
-    .bus-etas {
-      text-align: right;
-      min-width: 85px;
-    }
-
-    .eta-first {
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--amber-bright);
-      text-shadow: 0 0 8px var(--amber-glow);
-    }
-
-    .eta-arriving {
-      animation: blink 1s infinite;
-      color: #ffcc00;
-    }
-
-    .eta-next {
-      font-size: 12px;
-      color: #994d00;
-      margin-top: 2px;
-    }
-
-    /* 第三頁：家庭行事曆 */
-    .cal-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cal-row-inputs {
-      display: flex;
-      gap: 8px;
-    }
-
-    input[type="date"], input[type="text"], select {
-      background: #000;
-      border: 1px solid var(--amber-dim);
-      color: var(--amber);
-      padding: 8px 10px;
-      font-family: inherit;
-      font-size: 14px;
-      border-radius: 4px;
-      outline: none;
-    }
-
-    input[type="date"] { flex: 1; }
-    input[type="text"] { width: 100%; }
-
-    .event-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border-left: 3px solid var(--amber);
-      background: #120e0a;
-      margin-bottom: 8px;
-    }
-
-    .event-date {
-      font-size: 12px;
-      color: var(--amber-bright);
-    }
-
-    .event-title {
-      font-size: 15px;
-      margin-top: 3px;
-    }
-
-    .tag {
-      display: inline-block;
-      font-size: 11px;
-      border: 1px solid var(--amber);
-      padding: 1px 5px;
-      margin-right: 6px;
-      border-radius: 2px;
-    }
-
-    .del-btn {
-      background: none;
-      border: none;
-      color: #803d00;
-      font-size: 16px;
-      padding: 4px 8px;
-      cursor: pointer;
-    }
-
-    /* 底部導航列 */
-    nav {
-      display: flex;
-      border-top: 2px solid var(--border-color);
-      background: #080604;
-    }
-
-    .nav-item {
-      flex: 1;
-      text-align: center;
-      padding: 11px 0;
-      font-size: 13px;
-      color: #803d00;
-      cursor: pointer;
-      border-right: 1px solid #1f0f00;
-    }
-
-    .nav-item:last-child { border-right: none; }
-
-    .nav-item.active {
-      color: #000;
-      background: var(--amber);
-      font-weight: bold;
-      box-shadow: 0 0 15px var(--amber-glow);
-    }
-
-    .nav-icon {
-      display: block;
-      font-size: 15px;
-      margin-bottom: 2px;
+    /* 列印專用樣式：確保濃縮於 A4 一頁內，高對比清晰 */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+      body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #summary-view {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      #summary-card {
+        box-shadow: none !important;
+        border: 1.5px solid #111827 !important;
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        padding: 10px !important;
+      }
+      .print-grid-2 {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+      .print-text-dark {
+        color: #000000 !important;
+      }
     }
   </style>
 </head>
-<body>
+<body class="bg-pro-bg text-zinc-900 dark:bg-pro-darkBg dark:text-zinc-100 transition-colors duration-200 pb-28">
 
-  <header>
-    <div class="sys-title">SHATIN YUE CHUI // TERMINAL</div>
-    <div class="live-badge"><span class="dot"></span> ONLINE</div>
+  <!-- 頂部導航與工具列 -->
+  <header class="no-print sticky top-0 z-40 bg-white/95 dark:bg-pro-darkCard/95 backdrop-blur border-b border-zinc-200 dark:border-pro-darkBorder shadow-sm">
+    <div class="max-w-3xl mx-auto px-3 pt-2.5 pb-1.5 flex items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800/80">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="px-2 py-0.5 rounded-md bg-zinc-900 dark:bg-pro-accent text-white font-black text-xs tracking-wider shrink-0">
+          荒山映像
+        </span>
+        <h1 class="font-black text-sm sm:text-base tracking-tight text-zinc-900 dark:text-white truncate">
+          荒山映像 婚禮攝影開會紀錄
+        </h1>
+      </div>
+      <span class="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 shrink-0 hidden sm:inline">
+        WEDDING CALL SHEET
+      </span>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-3 py-2 flex items-center justify-between gap-2">
+      <!-- 新人切換器 -->
+      <div class="flex items-center gap-2 min-w-0 flex-1">
+        <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">新人檔案：</span>
+        <div class="min-w-0 flex-1">
+          <select id="record-selector" onchange="switchRecord(this.value)" class="w-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold text-sm rounded-lg px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-pro-accent truncate">
+          </select>
+        </div>
+      </div>
+
+      <!-- 快捷操作按鈕群 -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="createNewRecord()" title="新增新人紀錄" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4"/></svg>
+          <span class="hidden sm:inline">新增</span>
+        </button>
+
+        <button onclick="toggleDarkMode()" id="theme-toggle" title="切換暗光模式" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-amber-400">
+          <!-- Sun / Moon icon injected by JS -->
+        </button>
+
+        <button onclick="openManageModal()" title="管理/範例/重設" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 分頁標籤 Tab -->
+    <div class="max-w-3xl mx-auto px-3 pb-2">
+      <div class="grid grid-cols-3 gap-1 bg-zinc-200/80 dark:bg-zinc-900 p-1 rounded-xl">
+        <button id="tab-btn-form" onclick="switchTab('form')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-pro-darkCard text-zinc-900 dark:text-white shadow-sm flex items-center justify-center gap-1">
+          <span>1. 手機輸入</span>
+        </button>
+        <button id="tab-btn-summary" onclick="switchTab('summary')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
+          <span>2. 速查卡</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-pro-accent"></span>
+        </button>
+        <button id="tab-btn-export" onclick="switchTab('export')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
+          <span>3. 試算表匯出</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 手機快速跳轉分區導航列 (僅在輸入表單分頁顯示) -->
+    <div id="mobile-section-nav" class="max-w-3xl mx-auto px-3 pb-2 overflow-x-auto no-scrollbar">
+      <div class="flex items-center gap-1.5 min-w-max">
+        <button type="button" onclick="jumpToSection('sec-basic')" class="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:bg-pro-accent active:text-white text-xs font-extrabold text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+          01 基本/場地
+        </button>
+        <button type="button" onclick="jumpToSection('sec-family')" class="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:bg-pro-accent active:text-white text-xs font-extrabold text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+          02 男女家/關係
+        </button>
+        <button type="button" onclick="jumpToSection('sec-crew')" class="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:bg-pro-accent active:text-white text-xs font-extrabold text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+          03 膳食/車位
+        </button>
+        <button type="button" onclick="jumpToSection('sec-flow')" class="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:bg-pro-accent active:text-white text-xs font-extrabold text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+          04 拍攝環節
+        </button>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <!-- 第一頁：天氣與時鐘 -->
-    <section id="page-weather" class="page active">
-      <div class="retro-box">
-        <div class="box-label"><span>SYSTEM CLOCK</span><span>HKT UTC+8</span></div>
-        <div class="clock-display" id="clock">00:00:00</div>
-        <div class="date-display" id="date">LOADING...</div>
-      </div>
+  <!-- 主內容容器 -->
+  <main class="max-w-3xl mx-auto px-3 pt-4">
 
-      <div class="retro-box">
-        <div class="box-label"><span>HKO WEATHER // 沙田區</span><span id="weather-update">--:--</span></div>
-        <div class="weather-main">
-          <div class="temp-big" id="temp">--°</div>
-          <div class="weather-stats">
-            <div>相對濕度：<span id="humidity">--</span>%</div>
-            <div>天氣狀況：<span id="weather-desc">讀取中</span></div>
-            <div>紫外線：<span id="uv-index">--</span></div>
-          </div>
+    <!-- ========================================== -->
+    <!-- 分頁一：開會輸入表單 (FORM VIEW)            -->
+    <!-- ========================================== -->
+    <div id="form-view" class="space-y-4">
+
+      <!-- 儲存狀態提示條與快捷操作 -->
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400 px-1">
+        <span id="save-indicator" class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>即時自動儲存</span>
+        </span>
+        <div class="flex items-center gap-2.5">
+          <button type="button" onclick="toggleAllSections()" id="toggle-all-btn" class="text-zinc-600 dark:text-zinc-300 font-bold underline">
+            全部收起
+          </button>
+          <button type="button" onclick="loadSampleDaisyKenny()" class="text-pro-accent font-bold hover:underline">
+            載入範例
+          </button>
+          <button type="button" onclick="confirmClearAllFields()" class="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 font-extrabold active:scale-95 transition">
+            清除所有項目
+          </button>
         </div>
       </div>
 
-      <div class="retro-box">
-        <div class="box-label"><span>LOCAL FORECAST // 本港天氣預報</span></div>
-        <div class="forecast-text" id="forecast-text">正在連線香港天文台伺服器...</div>
-      </div>
-    </section>
+      <!-- 區塊一：基本資料與團隊陣容 -->
+      <section id="sec-basic" class="scroll-mt-36 bg-white dark:bg-pro-darkCard rounded-2xl shadow-sm border border-zinc-200/80 dark:border-pro-darkBorder overflow-hidden">
+        <button type="button" onclick="toggleSectionBody('body-basic', 'chev-basic')" class="w-full p-4 flex items-center justify-between text-left active:bg-zinc-50 dark:active:bg-zinc-800/50">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white text-xs font-extrabold">01</span>
+            <h2 class="font-extrabold text-base tracking-tight">基本資料與場地團隊</h2>
+          </div>
+          <svg id="chev-basic" class="w-5 h-5 text-zinc-400 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
 
-    <!-- 第二頁：沙田愉翠苑附近巴士報站器 -->
-    <section id="page-bus" class="page">
-      <div class="bus-top-bar">
+        <div id="body-basic" class="px-4 pb-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-3.5">
+          <!-- 1. 新人名字 & 2. 婚禮日期 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">1. 新人名字 (Name)</label>
+              <input type="text" data-field="coupleName" placeholder="例如：Daisy & Kenny" class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-3 text-base font-bold focus:outline-none focus:border-pro-accent" />
+            </div>
+            <div>
+              <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                2. 婚禮日期 (Date) <span id="weekday-badge" class="ml-1 text-pro-accent font-extrabold"></span>
+              </label>
+              <input type="date" data-field="weddingDate" class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-3 text-base font-bold focus:outline-none focus:border-pro-accent" />
+            </div>
+          </div>
+
+          <!-- 3. 服務方案 (Hybrid) -->
+          <div id="hybrid-package"></div>
+
+          <!-- 4. 出門吉時 & 入門吉時 (Hybrid) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div id="hybrid-auspiciousLeaveTime"></div>
+            <div id="hybrid-auspiciousEnterTime"></div>
+          </div>
+
+          <!-- 5. 出門地點 (Bride's Location) -->
+          <div id="hybrid-brideLocation"></div>
+
+          <!-- 6. 入門地點 (Groom's Location) -->
+          <div id="hybrid-groomLocation"></div>
+
+          <!-- 7. 證婚場地及狀態 -->
+          <div id="hybrid-ceremonyVenue"></div>
+
+          <!-- 8. 宴會場地及圍數 -->
+          <div id="hybrid-banquetVenue"></div>
+
+          <!-- 9. 兄弟姊妹人數 (大拇指步進器) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div id="stepper-bridesmaidsCount"></div>
+            <div id="stepper-groomsmenCount"></div>
+          </div>
+
+          <!-- 10. 合作單位 (Vendors) -->
+          <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-3.5">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">合作單位 (Vendors)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div id="hybrid-videoTeam"></div>
+              <div id="hybrid-mc"></div>
+              <div id="hybrid-daiKam"></div>
+              <div>
+                <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">化妝師 (MUA)</label>
+                <input type="text" data-field="mua" placeholder="例如：Amy Ng" class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-3 text-base font-semibold focus:outline-none focus:border-pro-accent" />
+              </div>
+              <div id="hybrid-celebrant"></div>
+              <div id="hybrid-deco"></div>
+            </div>
+            <div id="hybrid-weddingCar"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 區塊二：服裝、敬茶與雙方家庭關係 -->
+      <section id="sec-family" class="scroll-mt-36 bg-white dark:bg-pro-darkCard rounded-2xl shadow-sm border border-zinc-200/80 dark:border-pro-darkBorder overflow-hidden">
+        <button type="button" onclick="toggleSectionBody('body-family', 'chev-family')" class="w-full p-4 flex items-center justify-between text-left active:bg-zinc-50 dark:active:bg-zinc-800/50">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white text-xs font-extrabold">02</span>
+            <h2 class="font-extrabold text-base tracking-tight">服裝、敬茶與雙方家庭關係</h2>
+          </div>
+          <svg id="chev-family" class="w-5 h-5 text-zinc-400 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <div id="body-family" class="px-4 pb-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-3.5">
+          <!-- 手機單手分頁切換女家/男家 (預設優先顯示單邊，減少手機超長捲動) -->
+          <div class="grid grid-cols-3 gap-1.5 bg-zinc-100 dark:bg-zinc-900 p-1.5 rounded-xl sticky top-[132px] z-20 shadow-xs border border-zinc-200/70 dark:border-zinc-800">
+            <button type="button" onclick="filterFamilySide('bride')" id="fam-tab-bride" class="py-2.5 text-xs sm:text-sm font-extrabold rounded-lg bg-rose-600 text-white shadow-sm transition">
+              👰 女家 (新娘)
+            </button>
+            <button type="button" onclick="filterFamilySide('groom')" id="fam-tab-groom" class="py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-sky-700 dark:text-sky-400 transition">
+              🤵 男家 (新郎)
+            </button>
+            <button type="button" onclick="filterFamilySide('all')" id="fam-tab-all" class="py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-zinc-600 dark:text-zinc-300 transition">
+              雙欄並排
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 女家 (新娘) -->
+            <div id="bride-family-panel" class="rounded-2xl bg-rose-50/50 dark:bg-rose-950/15 border border-rose-200/80 dark:border-rose-900/40 p-3.5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                  <h3 class="font-extrabold text-sm text-rose-800 dark:text-rose-300">女家 (新娘 Bride)</h3>
+                </div>
+                <button type="button" onclick="filterFamilySide('groom')" class="sm:hidden text-xs font-extrabold text-sky-600 dark:text-sky-400 underline">
+                  填完去男家 →
+                </button>
+              </div>
+
+              <div id="hybrid-brideAttire"></div>
+              <div id="hybrid-brideTeaSets"></div>
+              <div id="hybrid-brideParentsStatus"></div>
+
+              <!-- 關係融洽度評分 1-10 (大按鈕加減步進版) -->
+              <div class="space-y-3 bg-white/90 dark:bg-zinc-900/90 p-3 rounded-xl border border-rose-100 dark:border-zinc-800">
+                <div id="rating-brideParentsRel"></div>
+                <div id="rating-brideSelfParentsRel"></div>
+              </div>
+
+              <!-- 親生兄弟姊妹多項快選器 (女家) -->
+              <div id="siblings-builder-bride"></div>
+              <div id="hybrid-brideGrandparents"></div>
+            </div>
+
+            <!-- 男家 (新郎) -->
+            <div id="groom-family-panel" class="hidden md:block rounded-2xl bg-sky-50/50 dark:bg-sky-950/15 border border-sky-200/80 dark:border-sky-900/40 p-3.5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                  <h3 class="font-extrabold text-sm text-sky-800 dark:text-sky-300">男家 (新郎 Groom)</h3>
+                </div>
+                <button type="button" onclick="filterFamilySide('bride')" class="sm:hidden text-xs font-extrabold text-rose-600 dark:text-rose-400 underline">
+                  ← 返回女家
+                </button>
+              </div>
+
+              <div id="hybrid-groomAttire"></div>
+              <div id="hybrid-groomTeaSets"></div>
+              <div id="hybrid-groomParentsStatus"></div>
+
+              <!-- 關係融洽度評分 1-10 (大按鈕加減步進版) -->
+              <div class="space-y-3 bg-white/90 dark:bg-zinc-900/90 p-3 rounded-xl border border-sky-100 dark:border-zinc-800">
+                <div id="rating-groomParentsRel"></div>
+                <div id="rating-groomSelfParentsRel"></div>
+              </div>
+
+              <!-- 親生兄弟姊妹多項快選器 (男家) -->
+              <div id="siblings-builder-groom"></div>
+              <div id="hybrid-groomGrandparents"></div>
+            </div>
+          </div>
+
+          <!-- 17. 家庭特別備註 -->
+          <div>
+            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">17. 家庭特別備註 (Family Remark / 拍攝禁忌或次序)</label>
+            <textarea data-field="familyRemark" rows="2" placeholder="例如：女家婆婆行動不便坐輪椅、男家父母分開坐唔好影同框、敬茶次序..." class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base focus:outline-none focus:border-pro-accent"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 區塊三：Crew Meal 膳食與交通車位安排 -->
+      <section id="sec-crew" class="scroll-mt-36 bg-white dark:bg-pro-darkCard rounded-2xl shadow-sm border border-zinc-200/80 dark:border-pro-darkBorder overflow-hidden">
+        <button type="button" onclick="toggleSectionBody('body-crew', 'chev-crew')" class="w-full p-4 flex items-center justify-between text-left active:bg-zinc-50 dark:active:bg-zinc-800/50">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white text-xs font-extrabold">03</span>
+            <h2 class="font-extrabold text-base tracking-tight">Crew Meal 膳食與交通車位</h2>
+          </div>
+          <svg id="chev-crew" class="w-5 h-5 text-zinc-400 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <div id="body-crew" class="px-4 pb-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div id="hybrid-crewLunch"></div>
+            <div id="hybrid-crewDinner"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <div id="hybrid-transport"></div>
+            <div id="hybrid-parking"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 區塊四：早上拍攝、證婚及晚宴環節 -->
+      <section id="sec-flow" class="scroll-mt-36 bg-white dark:bg-pro-darkCard rounded-2xl shadow-sm border border-zinc-200/80 dark:border-pro-darkBorder overflow-hidden">
+        <button type="button" onclick="toggleSectionBody('body-flow', 'chev-flow')" class="w-full p-4 flex items-center justify-between text-left active:bg-zinc-50 dark:active:bg-zinc-800/50">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white text-xs font-extrabold">04</span>
+            <h2 class="font-extrabold text-base tracking-tight">早上拍攝、證婚及晚宴環節</h2>
+          </div>
+          <svg id="chev-flow" class="w-5 h-5 text-zinc-400 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <div id="body-flow" class="px-4 pb-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-3.5">
+          <div id="hybrid-morningSession"></div>
+          <div id="hybrid-ceremonyMarchIn"></div>
+          <div id="hybrid-ceremonyRituals"></div>
+          <div id="hybrid-banquetHighlights"></div>
+
+          <div>
+            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">23. 攝影師全日特別備註 (General Notes / Must-shot)</label>
+            <textarea data-field="generalNotes" rows="3" placeholder="例如：必影婚戒細節、17:30 酒店花園影 Sunset Portrait、全晚唔玩遊戲純敬酒..." class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base focus:outline-none focus:border-pro-accent"></textarea>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 分頁二：攝影師一頁速查卡 (SUMMARY VIEW)      -->
+    <!-- ========================================== -->
+    <div id="summary-view" class="hidden space-y-4">
+
+      <!-- 匯出與操作工具列 -->
+      <div class="no-print flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-pro-darkCard p-3 rounded-2xl border border-zinc-200 dark:border-pro-darkBorder shadow-sm">
+        <button onclick="copyWhatsAppText()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+          <span>複製 WhatsApp 文字版</span>
+        </button>
+
+        <button onclick="window.print()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>列印 / 存為 A4 PDF</span>
+        </button>
+      </div>
+
+      <!-- 一頁速查卡片本體 -->
+      <div id="summary-card" class="bg-white dark:bg-pro-darkCard rounded-2xl border-2 border-zinc-900 dark:border-zinc-700 shadow-md overflow-hidden">
+        <!-- 由 JS 動態渲染精簡排版 -->
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 分頁三：試算表紀錄匯出 (SPREADSHEET EXPORT) -->
+    <!-- ========================================== -->
+    <div id="export-view" class="hidden space-y-4">
+      <div class="bg-white dark:bg-pro-darkCard rounded-2xl p-4 border border-zinc-200 dark:border-pro-darkBorder shadow-sm space-y-3.5">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h2 class="font-black text-base text-zinc-900 dark:text-white">📊 試算表紀錄整合 (Excel / Google Sheets)</h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              已將所有開會項目整理為單行橫向欄位格式，複製後直接貼上試算表儲存格即可自動分欄。
+            </p>
+          </div>
+        </div>
+
+        <!-- 複製操作按鈕群 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button type="button" onclick="copySpreadsheetRow(false)" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+            <span>📋 複製單行資料 (貼上試算表)</span>
+          </button>
+          <button type="button" onclick="copySpreadsheetRow(true)" class="py-3 px-4 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+            <span>📑 連同標題列一併複製 (首次建表)</span>
+          </button>
+        </div>
+
+        <!-- 橫向預覽表格 -->
+        <div class="border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden">
+          <div class="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 text-[11px] font-extrabold text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
+            <span>橫向欄位預覽 (可左右滑動檢視)</span>
+            <span id="export-col-count" class="text-pro-accent"></span>
+          </div>
+          <div id="spreadsheet-preview-container" class="overflow-x-auto bg-white dark:bg-zinc-900">
+            <!-- 由 JS 動態生成預覽表格 -->
+          </div>
+        </div>
+
+        <!-- 純文字 TSV 備用框 -->
         <div>
-          <div style="font-size: 16px; font-weight: bold;">沙田愉翠苑 // 巴士報站器</div>
-          <div style="font-size: 11px; color: #b35900;" id="bus-update-time">準備連線九巴數據庫...</div>
-        </div>
-        <button class="btn-retro" onclick="fetchBusETA(true)">↻ 立即刷新</button>
-      </div>
-
-      <div class="bus-filter-bar">
-        <input type="text" id="bus-search" class="bus-search" placeholder="搜尋路線 (如 80K, 89X, 49X)..." oninput="renderBusList()" />
-        <button class="btn-retro" id="btn-only-pinned" onclick="togglePinnedFilter()">★ 只看收藏</button>
-      </div>
-
-      <div id="bus-list">
-        <div class="retro-box" style="text-align:center; padding: 30px;">正在搜尋愉翠苑周邊所有巴士站...</div>
-      </div>
-    </section>
-
-    <!-- 第三頁：家庭共用行事曆 -->
-    <section id="page-calendar" class="page">
-      <div class="retro-box">
-        <div class="box-label"><span>NEW SCHEDULE // 新增家庭日程</span></div>
-        <div class="cal-form">
-          <div class="cal-row-inputs">
-            <input type="date" id="event-date" />
-            <select id="event-tag">
-              <option value="家庭">家庭</option>
-              <option value="學校">學校</option>
-              <option value="覆診">覆診</option>
-              <option value="繳費">繳費</option>
-            </select>
-          </div>
-          <div class="cal-row-inputs">
-            <input type="text" id="event-title" placeholder="輸入事項（例如：交功課 / 飲茶）" />
-            <button class="btn-retro" onclick="addEvent()">+ 加入</button>
-          </div>
+          <label class="block text-xs font-extrabold text-zinc-600 dark:text-zinc-400 mb-1">TSV 純文字備份框（亦可手動全選複製）：</label>
+          <textarea id="spreadsheet-tsv-box" readonly rows="3" class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 p-2.5 text-xs font-mono text-zinc-700 dark:text-zinc-300 focus:outline-none"></textarea>
         </div>
       </div>
+    </div>
 
-      <div class="retro-box">
-        <div class="box-label"><span>SHARED LOG // 近期家庭日程</span><span id="event-count">0 項</span></div>
-        <div id="event-list"></div>
-      </div>
-    </section>
   </main>
 
-  <nav>
-    <div class="nav-item active" onclick="switchTab('weather', this)">
-      <span class="nav-icon">[ 01 ]</span>天氣時鐘
+  <!-- 底部固定懸浮切換按鈕 -->
+  <div class="no-print fixed bottom-0 inset-x-0 z-40 bg-gradient-to-t from-pro-bg via-pro-bg/95 to-transparent dark:from-pro-darkBg dark:via-pro-darkBg/95 pt-4 pb-3 px-3 pointer-events-none">
+    <div class="max-w-3xl mx-auto flex justify-center pointer-events-auto">
+      <button id="floating-switch-btn" onclick="toggleTab()" class="w-full sm:w-auto sm:min-w-[320px] py-3 px-6 rounded-full bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-95 transition border border-white/10">
+        <span id="floating-btn-text">生成並檢視：攝影師一頁速查卡</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </button>
     </div>
-    <div class="nav-item" onclick="switchTab('bus', this)">
-      <span class="nav-icon">[ 02 ]</span>愉翠巴士
+  </div>
+
+  <!-- Toast 提示訊息框 (替代 alert) -->
+  <div id="toast" class="no-print fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-2.5 rounded-full text-xs font-bold shadow-xl opacity-0 pointer-events-none transition-opacity duration-200 flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toast-msg">已複製到剪貼簿</span>
+  </div>
+
+  <!-- 清除所有項目安全確認彈窗 (替代 confirm) -->
+  <div id="clear-confirm-modal" class="no-print fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-pro-darkCard w-full max-w-sm rounded-2xl p-5 border border-zinc-200 dark:border-zinc-700 shadow-2xl space-y-4">
+      <div class="space-y-1.5">
+        <h3 class="font-black text-base text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+          <span>⚠️ 確定清除所有項目？</span>
+        </h3>
+        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+          此操作將會清空目前新人表單中的所有已填寫與已點選項目，還原為空白表單。
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
+        <button type="button" onclick="closeClearConfirmModal()" class="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-bold text-xs sm:text-sm">
+          取消
+        </button>
+        <button type="button" onclick="executeClearAllFields()" class="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs sm:text-sm shadow-sm">
+          確定全部清除
+        </button>
+      </div>
     </div>
-    <div class="nav-item" onclick="switchTab('calendar', this)">
-      <span class="nav-icon">[ 03 ]</span>家庭日程
+  </div>
+
+  <!-- 管理與重設彈窗 (替代 confirm) -->
+  <div id="manage-modal" class="no-print fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-pro-darkCard w-full max-w-md rounded-2xl p-5 border border-zinc-200 dark:border-zinc-700 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+        <h3 class="font-extrabold text-base">紀錄管理與快捷操作</h3>
+        <button onclick="closeManageModal()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">✕</button>
+      </div>
+
+      <div class="space-y-2.5">
+        <button onclick="createNewRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-left text-sm font-bold flex items-center justify-between">
+          <span>＋ 新增空白新人紀錄</span>
+          <span class="text-xs text-zinc-500">New</span>
+        </button>
+
+        <button onclick="loadSampleDaisyKenny(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-pro-accent hover:bg-orange-100 text-left text-sm font-bold flex items-center justify-between">
+          <span>📋 填入「Daisy & Kenny」範例資料</span>
+          <span class="text-xs">Demo</span>
+        </button>
+
+        <button onclick="clearCurrentRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 hover:bg-amber-100 text-left text-sm font-bold flex items-center justify-between">
+          <span>🧹 清空目前表單所有欄位</span>
+          <span class="text-xs">Reset</span>
+        </button>
+
+        <button onclick="deleteCurrentRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 text-left text-sm font-bold flex items-center justify-between">
+          <span>🗑️ 刪除此對新人檔案</span>
+          <span class="text-xs">Delete</span>
+        </button>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeManageModal()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 text-white text-xs font-bold">關閉</button>
+      </div>
     </div>
-  </nav>
+  </div>
 
   <script>
-    let busAutoRefreshTimer = null;
+    // ==========================================
+    // 0. 香港主要婚禮酒店分區清單 (HK WEDDING HOTELS)
+    // ==========================================
+    const HK_HOTELS_BY_REGION = [
+      {
+        region: '九龍區 (Kowloon)',
+        hotels: [
+          '香港瑰麗酒店 (Rosewood)',
+          '香港半島酒店 (The Peninsula)',
+          '香港麗思卡爾頓酒店 (The Ritz-Carlton)',
+          '香港W酒店 (W Hong Kong)',
+          '香港嘉里酒店 (Kerry Hotel)',
+          '九龍香格里拉 (Kowloon Shangri-La)',
+          '唯港薈 (Hotel ICON)',
+          '香港朗廷酒店 (The Langham)',
+          '香港康得思酒店 (Cordis)',
+          '香港喜來登酒店 (Sheraton)',
+          '香港逸東酒店 (Eaton HK)',
+          '香港海景嘉福洲際酒店 (InterContinental Grand Stanford)',
+          '九龍海逸君綽酒店 (Harbour Grand Kowloon)',
+          '帝京酒店 (Royal Plaza)',
+          '帝苑酒店 (The Royal Garden)',
+          '馬哥孛羅香港酒店 (Marco Polo)',
+          '港威酒店 (Gateway Hotel)',
+          '香港太子酒店 (Prince Hotel)',
+          '香港尖沙咀凱悅酒店 (Hyatt Regency TST)',
+          '香港九龍東皇冠假日酒店 (Crowne Plaza TKO)'
+        ]
+      },
+      {
+        region: '港島區 (Hong Kong Island)',
+        hotels: [
+          '香港四季酒店 (Four Seasons)',
+          '港島香格里拉 (Island Shangri-La)',
+          '香港文華東方酒店 (Mandarin Oriental)',
+          '香港置地文華東方酒店 (The Landmark Mandarin Oriental)',
+          '香港奕居 (The Upper House)',
+          '香港港麗酒店 (Conrad)',
+          '香港JW萬豪酒店 (JW Marriott)',
+          '香港瑞吉酒店 (The St. Regis)',
+          '香港君悅酒店 (Grand Hyatt)',
+          '香港美利酒店 (The Murray)',
+          '香港海洋公園萬豪酒店 (Ocean Park Marriott)',
+          '香港富麗敦海洋公園酒店 (The Fullerton Ocean Park)',
+          '港島海逸君綽酒店 (Harbour Grand HK)',
+          '香港萬麗海景酒店 (Renaissance Harbour View)',
+          '歷山酒店 (Hotel Alexandra)',
+          '香港柏寧酒店 (The Park Lane)',
+          '香港銅鑼灣皇冠假日酒店 (Crowne Plaza CWB)'
+        ]
+      },
+      {
+        region: '新界及離島區 (New Territories & Islands)',
+        hotels: [
+          '香港沙田凱悅酒店 (Hyatt Regency Sha Tin)',
+          '帝都酒店 (Royal Park Hotel)',
+          '帝逸酒店 (ALVA Hotel)',
+          '香港愉景灣酒店 (Auberge Discovery Bay)',
+          '香港迪士尼樂園酒店 (Hong Kong Disneyland Hotel)',
+          '迪士尼探索家度假酒店 (Disney Explorers Lodge)',
+          '香港東涌世茂喜來登酒店 (Sheraton Tung Chung)',
+          '香港銀樾美憬閣精選酒店 (The Silveri)',
+          '挪亞方舟度假酒店 (Noah\'s Ark)',
+          '香港黃金海岸酒店 (Hong Kong Gold Coast Hotel)',
+          '荃灣西如心酒店 (Nina Hotel Tsuen Wan West)',
+          '嘉湖海逸酒店 (Harbour Plaza Resort City)'
+        ]
+      }
+    ];
 
-    // 1. 分頁切換
-    function switchTab(tabName, el) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('page-' + tabName).classList.add('active');
-      el.classList.add('active');
+    const HK_CHURCHES_BY_REGION = [
+      {
+        region: '港島區教堂 / 禮堂 (Hong Kong Island)',
+        churches: [
+          '聖約翰座堂 (St. John\'s Cathedral - 中環)',
+          '聖母無原罪主教座堂 (堅道天主教總堂)',
+          '聖瑪加利大堂 (跑馬地天主堂)',
+          '聖保羅堂 (中環鐵崗)',
+          '循道衛理聯合教會香港堂 (灣仔紅磚禮拜堂)',
+          '佑寧堂 (Union Church - 半山堅尼地道)',
+          '香港聖公會聖士提反堂 (西營盤)',
+          '香港聖公會聖馬利亞堂 (銅鑼灣)',
+          '聖若瑟堂 (中環花園道)',
+          '中華基督教會合一堂 (香港堂 - 半山)',
+          '薄扶林伯大尼小教堂 (Béthanie Chapel)'
+        ]
+      },
+      {
+        region: '九龍區教堂 / 禮堂 (Kowloon)',
+        churches: [
+          '九龍佑寧堂 (Kowloon Union Church - 佐敦)',
+          '聖安德烈堂 (St. Andrew\'s Church - 尖沙咀)',
+          '玫瑰堂 (Rosary Church - 尖沙咀)',
+          '基督君王小堂 (聖保祿學校 - 銅鑼灣)',
+          '九龍城浸信會 (九龍城)',
+          '中華基督教會九龍合一堂 (何文田)',
+          '聖公會諸聖座堂 (旺角)',
+          '聖公會聖三一座堂 (九龍城)',
+          '聖德肋撒堂 (九龍塘太子道)',
+          '聖方濟各堂 (石硤尾)'
+        ]
+      },
+      {
+        region: '新界及離島區教堂 / 禮堂 (New Territories & Islands)',
+        churches: [
+          '愉景灣海濱白教堂 (White Chapel - Discovery Bay)',
+          '沙田神召會 (沙田)',
+          '香港浸會大學大學會堂 / 善衡校園禮拜堂',
+          '香港中文大學崇基學院禮拜堂 (Chung Chi Chapel)',
+          '道風山基督教叢林聖殿 (沙田)',
+          '聖公會靈風堂 (沙田)',
+          '元朗聖伯多祿聖保祿堂 (元朗)',
+          '荃灣葛達二聖堂 (荃灣)',
+          '西貢聖心堂 (西貢)'
+        ]
+      }
+    ];
 
-      if (tabName === 'bus') {
-        fetchBusETA();
-        if (!busAutoRefreshTimer) {
-          busAutoRefreshTimer = setInterval(() => {
-            if (document.getElementById('page-bus').classList.contains('active')) {
-              fetchBusETA();
-            }
-          }, 30000); // 每 30 秒自動更新班次
+    // ==========================================
+    // 1. 欄位設定與預設標籤架構 (HYBRID CONFIG)
+    // ==========================================
+    const HYBRID_FIELDS = {
+      package: {
+        label: '3. 服務方案 (Full/Half & Team)',
+        mode: 'single',
+        options: ['Full 2P1V', 'Full 2P2V', 'Full 1P1V', 'Haft 2P1V', 'Half 2P1V', 'Half 1P1V', '證婚+晚宴'],
+        placeholder: '自訂方案，例如：Full 2P1V + SDE'
+      },
+      auspiciousLeaveTime: {
+        label: '4A. 出門吉時 (女家)',
+        mode: 'single',
+        options: ['0700-0900', '0800-1000', '0900-1100', '無吉時'],
+        placeholder: '自訂出門時段，例如：0730出門'
+      },
+      auspiciousEnterTime: {
+        label: '4B. 入門吉時 (男家)',
+        mode: 'single',
+        options: ['0700-0900', '0800-1000', '0900-1100', '無吉時'],
+        placeholder: '自訂入門時段，例如：0830入門'
+      },
+      brideLocation: {
+        label: '5. 出門地點 (Bride\'s Location)',
+        mode: 'multi',
+        multiline: true,
+        hasHotelPicker: true,
+        options: ['女家住宅', '酒店出門'],
+        placeholder: '選擇酒店後可直接補充房號，例如：Rm 2808 或 詳細住宅地址'
+      },
+      groomLocation: {
+        label: '6. 入門地點 (Groom\'s Location)',
+        mode: 'multi',
+        multiline: true,
+        hasHotelPicker: true,
+        options: ['男家住宅', '酒店入門', '同酒店不同房'],
+        placeholder: '選擇酒店後可直接補充房號或詳細地址'
+      },
+      ceremonyVenue: {
+        label: '7. 證婚場地及狀態 (Ceremony Venue)',
+        mode: 'multi',
+        hasHotelPicker: true,
+        hasChurchPicker: true,
+        options: ['已註冊', '現場證婚', '教堂', '婚姻登記處'],
+        placeholder: '選擇酒店/教堂或輸入證婚場地/廳名'
+      },
+      banquetVenue: {
+        label: '8. 宴會場地及圍數 (Banquet & Tables)',
+        mode: 'multi',
+        hasHotelPicker: true,
+        options: ['午宴', '晚宴', '雞尾酒會'],
+        placeholder: '選擇酒店後輸入廳名及圍數，例如：Grand Ballroom 12圍'
+      },
+      bridesmaidsCount: {
+        label: '9A. 姊妹團人數',
+        mode: 'single',
+        options: ['0', '2', '4', '6', '8', '10'],
+        placeholder: '自訂人數'
+      },
+      groomsmenCount: {
+        label: '9B. 兄弟團人數',
+        mode: 'single',
+        options: ['0', '2', '4', '6', '8', '10'],
+        placeholder: '自訂人數'
+      },
+      videoTeam: {
+        label: 'Video Team',
+        mode: 'single',
+        options: ['1V', '2V', '3V', '無'],
+        placeholder: '自訂 Video 團隊'
+      },
+      mc: {
+        label: 'MC (司儀)',
+        mode: 'single',
+        options: ['兄弟', '姊妹', '專業MC', '酒樓/酒店提供'],
+        placeholder: 'MC 名字或備註'
+      },
+      daiKam: {
+        label: '大妗姐',
+        mode: 'single',
+        options: ['有大妗', 'N/A'],
+        placeholder: '大妗姐名字/備註'
+      },
+      celebrant: {
+        label: '律師 (Celebrant)',
+        mode: 'single',
+        options: ['N/A', '現場律師'],
+        placeholder: '律師名字/時間'
+      },
+      deco: {
+        label: 'DECO (場地佈置)',
+        mode: 'single',
+        options: ['有DECO', '場地基本佈置', 'N/A'],
+        placeholder: 'DECO 公司或備註'
+      },
+      weddingCar: {
+        label: '花車 (Wedding Car)',
+        mode: 'multi',
+        options: ['28座', '租車', '兄弟車', 'N/A'],
+        placeholder: '車型及時間，例如：Model X 租車 0700-1000'
+      },
+      // 女家
+      brideAttire: {
+        label: '11. 出門服裝 (女)',
+        mode: 'multi',
+        options: ['裙褂', '紅裙', '旗袍', '婚紗', '秀禾服'],
+        placeholder: '其他服裝備註'
+      },
+      brideTeaSets: {
+        label: '12. 敬茶組合 (女)',
+        mode: 'single',
+        options: ['1組', '2組', '3組', '4組', '5組+'],
+        placeholder: '敬茶細節（如：父母、婆婆）'
+      },
+      brideParentsStatus: {
+        label: '13. 家庭關係 (女)',
+        mode: 'single',
+        options: ['父母 BOTH', '母 ONLY', '父 ONLY', '離婚/分開'],
+        placeholder: '補充備註'
+      },
+      brideGrandparents: {
+        label: '16. 祖父母 (女)',
+        mode: 'multi',
+        options: ['爺爺', '嫲嫲', '公公', '婆婆', 'N/A'],
+        placeholder: '祖父母備註'
+      },
+      // 男家
+      groomAttire: {
+        label: '11. 出門/入門服裝 (男)',
+        mode: 'multi',
+        options: ['褂', '西裝', '中山裝', '馬褂'],
+        placeholder: '其他服裝備註'
+      },
+      groomTeaSets: {
+        label: '12. 敬茶組合 (男)',
+        mode: 'single',
+        options: ['1組', '2組', '3組', '4組', '5組+'],
+        placeholder: '敬茶細節（如：父母、婆婆）'
+      },
+      groomParentsStatus: {
+        label: '13. 家庭關係 (男)',
+        mode: 'single',
+        options: ['父母 BOTH', '母 ONLY', '父 ONLY', '離婚/分開'],
+        placeholder: '補充備註'
+      },
+      groomGrandparents: {
+        label: '16. 祖父母 (男)',
+        mode: 'multi',
+        options: ['爺爺', '嫲嫲', '公公', '婆婆', 'N/A'],
+        placeholder: '祖父母備註'
+      },
+      // Crew Meal & 交通
+      crewLunch: {
+        label: '18A. Crew Meal - Lunch',
+        mode: 'single',
+        options: ['外賣/飯盒', '自己食', '跟兄弟姊妹', '酒店/酒樓安排', 'N/A'],
+        placeholder: 'Lunch 備註'
+      },
+      crewDinner: {
+        label: '18B. Crew Meal - Dinner',
+        mode: 'single',
+        options: ['外賣/飯盒', '自己食', '跟兄弟姊妹', '酒店/酒樓安排', 'N/A'],
+        placeholder: 'Dinner 備註'
+      },
+      transport: {
+        label: '19A. 團隊交通安排',
+        mode: 'multi',
+        options: ['跟28座', '團隊自駕', 'Uber/的士', '步程可達'],
+        placeholder: '車程路線，例如：天水圍 -> 元朗'
+      },
+      parking: {
+        label: '19B. 泊車車位安排',
+        mode: 'single',
+        options: ['有車位', '冇車位', '酒店代客泊車', '需自費泊附近'],
+        placeholder: '車位數量/備註'
+      },
+      // 拍攝環節
+      morningSession: {
+        label: '20. 早上攝影安排 (Morning Session)',
+        mode: 'multi',
+        options: ['Bridal Shower', 'Girls Talk', 'Parents Talk', '紙碎', 'N/A'],
+        placeholder: '其他早上環節'
+      },
+      ceremonyMarchIn: {
+        label: '21A. 證婚進場方式 (March in)',
+        mode: 'multi',
+        options: ['爸爸帶進場', '媽媽帶進場', '父母雙親帶進場', '一對新人進場', '花仔花女', '戒童/寵物'],
+        placeholder: '自訂進場方式'
+      },
+      ceremonyRituals: {
+        label: '21B. 證婚儀式環節 (Ceremony Rituals)',
+        mode: 'multi',
+        options: ['March out', 'Remarch in', '拋花瓣', '泡泡', '紙碎', '拋花球', '大合照', 'TBC'],
+        placeholder: '其他證婚環節'
+      },
+      banquetHighlights: {
+        label: '22. 晚宴/派對特別環節 (Banquet Highlights)',
+        mode: 'multi',
+        options: ['切蛋糕 CAKE', '致辭 SPEECH', '送花給父母', '敬酒 Toasting', '播成長片段', '播早拍晚播 SDE', '玩遊戲', 'Live Band'],
+        placeholder: '其他晚宴環節'
+      }
+    };
+
+    const RATING_FIELDS = {
+      brideParentsRel: '14A. 父母之間關係',
+      brideSelfParentsRel: '14B. 新娘與父母關係',
+      groomParentsRel: '14A. 父母之間關係',
+      groomSelfParentsRel: '14B. 新郎與父母關係'
+    };
+
+    // ==========================================
+    // 2. 狀態管理與預設範例資料 (Daisy & Kenny)
+    // ==========================================
+    const STORAGE_KEY = 'hk_wedding_photo_logs_v2';
+    const THEME_KEY = 'hk_wedding_photo_theme_v1';
+
+    function getEmptyRecord(id) {
+      const record = {
+        id: id || 'rec_' + Date.now(),
+        updatedAt: Date.now(),
+        coupleName: '',
+        weddingDate: '',
+        mua: '',
+        familyRemark: '',
+        generalNotes: '',
+        brideParentsRel: 8,
+        brideSelfParentsRel: 8,
+        groomParentsRel: 8,
+        groomSelfParentsRel: 8,
+        brideSiblingsList: [],
+        brideSiblingsNote: '',
+        groomSiblingsList: [],
+        groomSiblingsNote: ''
+      };
+      Object.keys(HYBRID_FIELDS).forEach(key => {
+        record[key] = { selected: [], custom: '' };
+      });
+      return record;
+    }
+
+    function getDaisyKennySample(id) {
+      const rec = getEmptyRecord(id || 'rec_sample_daisy_kenny');
+      rec.coupleName = 'Daisy & Kenny';
+      rec.weddingDate = '2026-11-29';
+      rec.package = { selected: ['Haft 2P1V'], custom: '' };
+      rec.auspiciousLeaveTime = { selected: ['0700-0900'], custom: '' };
+      rec.auspiciousEnterTime = { selected: ['0800-1000'], custom: '' };
+      rec.brideLocation = {
+        selected: ['女家住宅'],
+        custom: '天水圍 Room A, 6/F, Block 8, 朗晴居 Grand Del Sol'
+      };
+      rec.groomLocation = {
+        selected: ['男家住宅'],
+        custom: '元朗 天盛苑 Room 3505, Block E, Tin Shing Court, Tin Shui Wai, N.T.'
+      };
+      rec.ceremonyVenue = { selected: ['已註冊'], custom: '香港逸東酒店 (Eaton HK)' };
+      rec.banquetVenue = { selected: [], custom: '香港逸東酒店 (Eaton HK) 10-12圍' };
+      rec.bridesmaidsCount = { selected: ['4'], custom: '' };
+      rec.groomsmenCount = { selected: ['4'], custom: '' };
+      rec.videoTeam = { selected: ['1V'], custom: '' };
+      rec.mc = { selected: ['兄弟'], custom: '' };
+      rec.daiKam = { selected: ['N/A'], custom: '' };
+      rec.mua = 'Amy Ng';
+      rec.celebrant = { selected: ['N/A'], custom: '' };
+      rec.deco = { selected: [], custom: '' };
+      rec.weddingCar = { selected: ['租車'], custom: 'Model X 租車 0700-1000' };
+
+      rec.brideAttire = { selected: ['裙褂'], custom: '' };
+      rec.brideTeaSets = { selected: ['2組'], custom: '' };
+      rec.brideParentsStatus = { selected: ['父母 BOTH'], custom: '' };
+      rec.brideParentsRel = 8;
+      rec.brideSelfParentsRel = 8;
+      rec.brideSiblingsList = [
+        { role: '姐姐', status: '單身', kids: 0 }
+      ];
+      rec.brideSiblingsNote = '';
+      rec.brideGrandparents = { selected: [], custom: '' };
+
+      rec.groomAttire = { selected: ['西裝'], custom: '' };
+      rec.groomTeaSets = { selected: ['2組'], custom: '' };
+      rec.groomParentsStatus = { selected: ['父母 BOTH'], custom: '' };
+      rec.groomParentsRel = 8;
+      rec.groomSelfParentsRel = 10;
+      rec.groomSiblingsList = [
+        { role: '妹妹', status: '+BF', kids: 0 }
+      ];
+      rec.groomSiblingsNote = '';
+      rec.groomGrandparents = { selected: ['婆婆'], custom: '' };
+
+      rec.familyRemark = '';
+      rec.crewLunch = { selected: ['外賣/飯盒'], custom: '' };
+      rec.crewDinner = { selected: [], custom: '' };
+      rec.transport = { selected: ['跟28座'], custom: '車程：天水圍 -> 元朗' };
+      rec.parking = { selected: ['冇車位'], custom: '' };
+
+      rec.morningSession = { selected: ['Girls Talk', 'Parents Talk'], custom: '' };
+      rec.ceremonyMarchIn = { selected: [], custom: '' };
+      rec.ceremonyRituals = { selected: ['拋花瓣'], custom: '' };
+      rec.banquetHighlights = { selected: ['切蛋糕 CAKE', '致辭 SPEECH', '送花給父母'], custom: '' };
+      rec.generalNotes = '';
+      return rec;
+    }
+
+    let appState = {
+      records: [],
+      activeId: null,
+      activeTab: 'form'
+    };
+
+    // ==========================================
+    // 3. 初始化與儲存機制
+    // ==========================================
+    function initApp() {
+      initTheme();
+      loadFromStorage();
+      renderHybridComponents();
+      renderPartyStepperComponents();
+      renderRatingComponents();
+      renderSiblingsBuilders();
+      bindStandardInputs();
+      populateFormFromRecord(getActiveRecord());
+      renderRecordSelector();
+      renderSummarySheet();
+    }
+
+    // ==========================================
+    // 3B. 手機折疊與快速跳轉控制
+    // ==========================================
+    function toggleSectionBody(bodyId, chevId) {
+      const body = document.getElementById(bodyId);
+      const chev = document.getElementById(chevId);
+      if (!body) return;
+      const isHidden = body.classList.toggle('hidden');
+      if (chev) {
+        chev.classList.toggle('rotate-180', !isHidden);
+      }
+    }
+
+    function jumpToSection(secId) {
+      const sec = document.getElementById(secId);
+      if (!sec) return;
+      const body = sec.querySelector('[id^="body-"]');
+      const chev = sec.querySelector('[id^="chev-"]');
+      if (body && body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        if (chev) chev.classList.add('rotate-180');
+      }
+      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    let allSectionsExpanded = true;
+    function toggleAllSections() {
+      allSectionsExpanded = !allSectionsExpanded;
+      const bodies = ['body-basic', 'body-family', 'body-crew', 'body-flow'];
+      const chevs = ['chev-basic', 'chev-family', 'chev-crew', 'chev-flow'];
+      bodies.forEach((bId, idx) => {
+        const b = document.getElementById(bId);
+        const c = document.getElementById(chevs[idx]);
+        if (b) b.classList.toggle('hidden', !allSectionsExpanded);
+        if (c) c.classList.toggle('rotate-180', allSectionsExpanded);
+      });
+      const btn = document.getElementById('toggle-all-btn');
+      if (btn) btn.textContent = allSectionsExpanded ? '全部收起' : '全部展開';
+    }
+
+    // ==========================================
+    // 3C. 姊妹/兄弟人數大按鈕步進器 (方便單手加減)
+    // ==========================================
+    function renderPartyStepperComponents() {
+      const configs = [
+        { key: 'bridesmaidsCount', label: '9A. 姊妹團人數', unit: '位姊妹' },
+        { key: 'groomsmenCount', label: '9B. 兄弟團人數', unit: '位兄弟' }
+      ];
+
+      configs.forEach(cfg => {
+        const container = document.getElementById(`stepper-${cfg.key}`);
+        if (!container) return;
+
+        container.innerHTML = `
+          <div class="bg-zinc-50 dark:bg-zinc-900/90 p-3 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-2">${cfg.label}</label>
+            <div class="flex items-center justify-between gap-2">
+              <button type="button" onclick="adjustPartyCount('${cfg.key}', -1)"
+                class="w-12 h-11 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-black text-xl text-zinc-800 dark:text-white active:scale-90 transition shadow-2xs">
+                －
+              </button>
+              <div class="flex-1 text-center">
+                <input type="number" min="0" max="50" inputmode="numeric"
+                  id="party-input-${cfg.key}"
+                  oninput="setPartyCount('${cfg.key}', this.value)"
+                  class="w-16 text-center bg-transparent font-black text-xl text-zinc-900 dark:text-white focus:outline-none" />
+                <span class="text-xs font-bold text-zinc-500 block -mt-1">${cfg.unit}</span>
+              </div>
+              <button type="button" onclick="adjustPartyCount('${cfg.key}', 1)"
+                class="w-12 h-11 rounded-xl bg-zinc-900 dark:bg-pro-accent font-black text-xl text-white active:scale-90 transition shadow-2xs">
+                ＋
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function getPartyNumber(rec, key) {
+      if (!rec[key]) return 0;
+      const raw = (rec[key].selected && rec[key].selected[0]) || rec[key].custom || '0';
+      const n = parseInt(raw, 10);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function adjustPartyCount(key, delta) {
+      const rec = getActiveRecord();
+      const next = Math.max(0, getPartyNumber(rec, key) + delta);
+      setPartyCount(key, next);
+    }
+
+    function setPartyCount(key, val) {
+      const rec = getActiveRecord();
+      const num = val === '' ? 0 : Math.max(0, parseInt(val, 10) || 0);
+      rec[key] = { selected: [String(num)], custom: '' };
+      updatePartyStepperVisuals(key);
+      saveToStorage();
+    }
+
+    function updatePartyStepperVisuals(key) {
+      const rec = getActiveRecord();
+      const inputEl = document.getElementById(`party-input-${key}`);
+      if (inputEl && document.activeElement !== inputEl) {
+        inputEl.value = getPartyNumber(rec, key);
+      }
+    }
+
+    function getActiveRecord() {
+      return appState.records.find(r => r.id === appState.activeId) || appState.records[0];
+    }
+
+    function saveToStorage() {
+      try {
+        const rec = getActiveRecord();
+        if (rec) rec.updatedAt = Date.now();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          records: appState.records,
+          activeId: appState.activeId
+        }));
+        renderRecordSelector();
+      } catch (e) {
+        console.error('Save error:', e);
+      }
+    }
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.records) && parsed.records.length > 0) {
+            appState.records = parsed.records;
+            appState.activeId = parsed.activeId || parsed.records[0].id;
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Load error:', e);
+      }
+      const sample = getDaisyKennySample();
+      appState.records = [sample];
+      appState.activeId = sample.id;
+      saveToStorage();
+    }
+
+    // ==========================================
+    // 4. 動態渲染 Hybrid 混合輸入元件 (含香港酒店快選器)
+    // ==========================================
+    function buildHotelSelectHtml(key) {
+      const optGroups = HK_HOTELS_BY_REGION.map(group => {
+        const opts = group.hotels.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('');
+        return `<optgroup label="${escapeHtml(group.region)}">${opts}</optgroup>`;
+      }).join('');
+
+      return `
+        <div class="mt-2 flex items-center gap-1.5">
+          <select id="hotel-picker-${key}" onchange="applyHotelToField('${key}', this)" class="w-full rounded-xl bg-amber-50/90 dark:bg-zinc-800 border border-amber-300/80 dark:border-zinc-600 px-3 py-3 text-sm font-bold text-zinc-800 dark:text-amber-200 focus:outline-none focus:border-pro-accent">
+            <option value="">🏨 快選香港主要酒店 (按九龍 / 港島 / 新界)...</option>
+            ${optGroups}
+          </select>
+        </div>
+      `;
+    }
+
+    function buildChurchSelectHtml(key) {
+      const optGroups = HK_CHURCHES_BY_REGION.map(group => {
+        const opts = group.churches.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        return `<optgroup label="${escapeHtml(group.region)}">${opts}</optgroup>`;
+      }).join('');
+
+      return `
+        <div id="church-picker-wrap-${key}" class="hidden mt-2 flex items-center gap-1.5">
+          <select id="church-picker-${key}" onchange="applyChurchToField('${key}', this)" class="w-full rounded-xl bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-300 dark:border-indigo-700 px-3 py-3 text-sm font-bold text-indigo-950 dark:text-indigo-200 focus:outline-none focus:border-pro-accent">
+            <option value="">⛪ 快選香港可證婚教堂 / 禮堂 (按地區)...</option>
+            ${optGroups}
+          </select>
+        </div>
+      `;
+    }
+
+    function applyChurchToField(key, selectEl) {
+      const churchName = selectEl.value;
+      if (!churchName) return;
+
+      const rec = getActiveRecord();
+      if (!rec[key]) rec[key] = { selected: [], custom: '' };
+
+      if (!rec[key].selected.includes('教堂')) {
+        rec[key].selected.push('教堂');
+        updateHybridVisuals(key);
+      }
+
+      const currentCustom = (rec[key].custom || '').trim();
+      if (!currentCustom) {
+        rec[key].custom = churchName + ' ';
+      } else if (!currentCustom.includes(churchName)) {
+        rec[key].custom = currentCustom + ' / ' + churchName + ' ';
+      }
+
+      const customEl = document.querySelector(`[data-hybrid-custom="${key}"]`);
+      if (customEl) {
+        customEl.value = rec[key].custom;
+        customEl.focus();
+      }
+
+      selectEl.value = '';
+      saveToStorage();
+      showToast(`已填入教堂：${churchName}`);
+    }
+
+    function applyHotelToField(key, selectEl) {
+      const hotelName = selectEl.value;
+      if (!hotelName) return;
+
+      const rec = getActiveRecord();
+      if (!rec[key]) rec[key] = { selected: [], custom: '' };
+
+      // 若有「酒店出門」或「酒店入門」標籤且尚未選取，自動幫忙點亮
+      const cfg = HYBRID_FIELDS[key];
+      const hotelTag = cfg.options.find(o => o.includes('酒店'));
+      if (hotelTag && !rec[key].selected.includes(hotelTag)) {
+        rec[key].selected.push(hotelTag);
+        updateHybridVisuals(key);
+      }
+
+      // 填入或附加至自訂文字框，方便直接打房號或廳名
+      const currentCustom = (rec[key].custom || '').trim();
+      if (!currentCustom) {
+        rec[key].custom = hotelName + ' ';
+      } else if (!currentCustom.includes(hotelName)) {
+        rec[key].custom = currentCustom + ' / ' + hotelName + ' ';
+      }
+
+      const customEl = document.querySelector(`[data-hybrid-custom="${key}"]`);
+      if (customEl) {
+        customEl.value = rec[key].custom;
+        customEl.focus();
+      }
+
+      selectEl.value = '';
+      saveToStorage();
+      showToast(`已填入：${hotelName}`);
+    }
+
+    function renderHybridComponents() {
+      Object.entries(HYBRID_FIELDS).forEach(([key, cfg]) => {
+        const container = document.getElementById(`hybrid-${key}`);
+        if (!container) return;
+
+        const pillsHtml = cfg.options.map(opt => `
+          <button type="button"
+            data-hybrid-key="${key}"
+            data-hybrid-opt="${opt}"
+            onclick="toggleHybridOption('${key}', '${opt.replace(/'/g, "\\'")}')"
+            class="hybrid-pill px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition-all active:scale-95 select-none bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700">
+            ${opt}
+          </button>
+        `).join('');
+
+        const hotelPickerHtml = cfg.hasHotelPicker ? buildHotelSelectHtml(key) : '';
+        const churchPickerHtml = cfg.hasChurchPicker ? buildChurchSelectHtml(key) : '';
+
+        const inputHtml = cfg.multiline
+          ? `<textarea data-hybrid-custom="${key}" rows="2" placeholder="${cfg.placeholder}" class="w-full mt-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent"></textarea>`
+          : `<input type="text" data-hybrid-custom="${key}" placeholder="${cfg.placeholder}" class="w-full mt-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent" />`;
+
+        container.innerHTML = `
+          <div>
+            <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-2">${cfg.label}</label>
+            <div class="flex flex-wrap gap-2">
+              ${pillsHtml}
+            </div>
+            ${hotelPickerHtml}
+            ${churchPickerHtml}
+            ${inputHtml}
+          </div>
+        `;
+
+        const customEl = container.querySelector(`[data-hybrid-custom="${key}"]`);
+        customEl.addEventListener('input', (e) => {
+          const rec = getActiveRecord();
+          rec[key].custom = e.target.value;
+          saveToStorage();
+        });
+      });
+    }
+
+    function toggleHybridOption(key, opt) {
+      const rec = getActiveRecord();
+      const cfg = HYBRID_FIELDS[key];
+      if (!rec[key]) rec[key] = { selected: [], custom: '' };
+
+      const list = rec[key].selected;
+      const idx = list.indexOf(opt);
+
+      if (cfg.mode === 'single') {
+        rec[key].selected = idx >= 0 ? [] : [opt];
+      } else {
+        if (idx >= 0) {
+          list.splice(idx, 1);
+        } else {
+          list.push(opt);
+        }
+      }
+      updateHybridVisuals(key);
+      saveToStorage();
+    }
+
+    function updateHybridVisuals(key) {
+      const rec = getActiveRecord();
+      const selected = (rec[key] && rec[key].selected) || [];
+      const buttons = document.querySelectorAll(`[data-hybrid-key="${key}"]`);
+      buttons.forEach(btn => {
+        const opt = btn.getAttribute('data-hybrid-opt');
+        const isActive = selected.includes(opt);
+        if (isActive) {
+          btn.className = 'hybrid-pill px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all active:scale-95 select-none bg-zinc-900 dark:bg-pro-accent text-white border-zinc-900 dark:border-pro-accent shadow-xs';
+        } else {
+          btn.className = 'hybrid-pill px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition-all active:scale-95 select-none bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700';
+        }
+      });
+
+      // 若該欄位具備教堂快選器，僅在點選「教堂」時顯示教堂清單
+      const churchWrap = document.getElementById(`church-picker-wrap-${key}`);
+      if (churchWrap) {
+        if (selected.includes('教堂')) {
+          churchWrap.classList.remove('hidden');
+        } else {
+          churchWrap.classList.add('hidden');
         }
       }
     }
 
-    // 2. 數碼時鐘
-    function updateClock() {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0];
-      const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} [ ${days[now.getDay()]} ]`;
-      document.getElementById('clock').innerText = timeStr;
-      document.getElementById('date').innerText = dateStr;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+    // ==========================================
+    // 4B. 精簡版父母關係 10 分制輸入 (手機大按鈕步進 + 快捷分數)
+    // ==========================================
+    function renderRatingComponents() {
+      Object.entries(RATING_FIELDS).forEach(([key, label]) => {
+        const container = document.getElementById(`rating-${key}`);
+        if (!container) return;
 
-    // 3. 香港天文台 API (天氣)
-    async function fetchWeather() {
-      try {
-        const resCurrent = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
-        const dataCurrent = await resCurrent.json();
+        const quickPresets = [3, 5, 7, 8, 9, 10].map(n => `
+          <button type="button"
+            data-rating-key="${key}"
+            data-rating-val="${n}"
+            onclick="setRating('${key}', ${n})"
+            class="flex-1 h-9 rounded-lg text-xs font-extrabold transition-all border active:scale-95">
+            ${n}
+          </button>
+        `).join('');
 
-        const shatinTemp = dataCurrent.temperature.data.find(d => d.place === '沙田') || dataCurrent.temperature.data[0];
-        document.getElementById('temp').innerText = `${shatinTemp.value}°`;
-        document.getElementById('humidity').innerText = dataCurrent.humidity.data[0].value;
-        document.getElementById('uv-index').innerText = dataCurrent.uvindex ? dataCurrent.uvindex.data[0].desc : '無資料';
-
-        const updateTime = new Date(dataCurrent.updateTime);
-        document.getElementById('weather-update').innerText = `${String(updateTime.getHours()).padStart(2,'0')}:${String(updateTime.getMinutes()).padStart(2,'0')} 更新`;
-
-        const resForecast = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=flw&lang=tc');
-        const dataForecast = await resForecast.json();
-        document.getElementById('weather-desc').innerText = dataForecast.generalSituation ? '正常' : '多雲';
-        document.getElementById('forecast-text').innerText = `${dataForecast.forecastDesc}\n\n${dataForecast.outlook}`;
-      } catch (err) {
-        document.getElementById('forecast-text').innerText = '天氣數據連線失敗，請檢查網絡。';
-      }
-    }
-    fetchWeather();
-
-    // 4. 沙田愉翠苑附近九巴實時報站器 (自動檢索愉翠苑周邊站點)
-    let yueChuiStopsCache = null;
-    let latestBusGroups = [];
-    let onlyShowPinned = false;
-    let pinnedRoutes = JSON.parse(localStorage.getItem('yuechui_pinned_routes') || '["80K", "82K", "89X", "49X"]');
-
-    function togglePin(routeKey) {
-      if (pinnedRoutes.includes(routeKey)) {
-        pinnedRoutes = pinnedRoutes.filter(r => r !== routeKey);
-      } else {
-        pinnedRoutes.push(routeKey);
-      }
-      localStorage.setItem('yuechui_pinned_routes', JSON.stringify(pinnedRoutes));
-      renderBusList();
-    }
-
-    function togglePinnedFilter() {
-      onlyShowPinned = !onlyShowPinned;
-      const btn = document.getElementById('btn-only-pinned');
-      btn.style.background = onlyShowPinned ? 'var(--amber)' : 'transparent';
-      btn.style.color = onlyShowPinned ? '#000' : 'var(--amber)';
-      renderBusList();
-    }
-
-    async function getYueChuiStops() {
-      if (yueChuiStopsCache) return yueChuiStopsCache;
-      // 從九巴官方站點庫動態匹配所有「愉翠苑」及「牛皮沙街/插桅杆街」站點
-      const res = await fetch('https://data.etabus.gov.hk/v1/transport/kmb/stop');
-      const json = await res.json();
-      yueChuiStopsCache = json.data.filter(s =>
-        s.name_tc.includes('愉翠苑') ||
-        s.name_tc.includes('牛皮沙街') ||
-        s.name_tc.includes('第一城站')
-      );
-      return yueChuiStopsCache;
-    }
-
-    async function fetchBusETA(manual = false) {
-      const statusEl = document.getElementById('bus-update-time');
-      if (manual) statusEl.innerText = '正在同步最新班次...';
-
-      try {
-        const stops = await getYueChuiStops();
-        const promises = stops.map(stop =>
-          fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop-eta/${stop.stop}`)
-            .then(r => r.json())
-            .then(j => (j.data || []).map(item => ({ ...item, stopName: stop.name_tc })))
-        );
-
-        const results = await Promise.all(promises);
-        const allRoutes = results.flat();
-
-        const grouped = {};
-        const now = new Date();
-
-        allRoutes.forEach(item => {
-          if (!item.eta) return;
-          // 過濾掉已經駛離超過 1 分鐘的舊班次
-          const etaDate = new Date(item.eta);
-          const diffSeconds = (etaDate - now) / 1000;
-          if (diffSeconds < -60) return;
-
-          const key = `${item.route}_${item.dir}_${item.stop}`;
-          if (!grouped[key]) {
-            grouped[key] = {
-              route: item.route,
-              dest: item.dest_tc,
-              stopName: item.stopName,
-              etas: [],
-              remarks: []
-            };
-          }
-          const diffMins = Math.max(0, Math.round(diffSeconds / 60));
-          grouped[key].etas.push(diffMins);
-          if (item.rmk_tc && !grouped[key].remarks.includes(item.rmk_tc)) {
-            grouped[key].remarks.push(item.rmk_tc);
-          }
-        });
-
-        latestBusGroups = Object.values(grouped).map(bus => {
-          bus.etas.sort((a, b) => a - b);
-          return bus;
-        });
-
-        renderBusList();
-
-        const t = new Date();
-        statusEl.innerText = `愉翠苑周邊 ${stops.length} 個站點 • ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')} 更新`;
-      } catch (e) {
-        document.getElementById('bus-list').innerHTML = '<div class="retro-box">九巴伺服器連線逾時，請按右上角刷新。</div>';
-      }
-    }
-
-    function renderBusList() {
-      const listEl = document.getElementById('bus-list');
-      const keyword = document.getElementById('bus-search').value.trim().toUpperCase();
-
-      let filtered = latestBusGroups.filter(bus => {
-        const matchKeyword = !keyword || bus.route.includes(keyword) || bus.dest.includes(keyword);
-        const matchPin = !onlyShowPinned || pinnedRoutes.includes(bus.route);
-        return matchKeyword && matchPin;
-      });
-
-      // 收藏路線置頂，其餘按路線號碼排序
-      filtered.sort((a, b) => {
-        const aPin = pinnedRoutes.includes(a.route) ? 0 : 1;
-        const bPin = pinnedRoutes.includes(b.route) ? 0 : 1;
-        if (aPin !== bPin) return aPin - bPin;
-        return a.route.localeCompare(b.route, undefined, { numeric: true });
-      });
-
-      if (filtered.length === 0) {
-        listEl.innerHTML = '<div class="retro-box" style="text-align:center; padding: 24px;">找不到符合條件的巴士班次</div>';
-        return;
-      }
-
-      listEl.innerHTML = filtered.map(bus => {
-        const isPinned = pinnedRoutes.includes(bus.route);
-        const firstMin = bus.etas[0];
-        const firstText = firstMin === 0 ? '即將到達' : `${firstMin} 分鐘`;
-        const arrivingClass = firstMin <= 1 ? 'eta-arriving' : '';
-        const nextText = bus.etas.slice(1, 3).map(m => `${m}分`).join(' / ') || '暫無下班';
-        const rmkText = bus.remarks.length > 0 ? ` [${bus.remarks[0]}]` : '';
-
-        return `
-          <div class="bus-row ${isPinned ? 'pinned' : ''}">
-            <button class="star-btn ${isPinned ? 'active' : ''}" onclick="togglePin('${bus.route}')">★</button>
-            <div class="bus-route">${bus.route}</div>
-            <div class="bus-dest">
-              <div class="bus-dest-main">往 ${bus.dest}</div>
-              <div class="bus-stop-sub">@ ${bus.stopName}${rmkText}</div>
+        container.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-zinc-700 dark:text-zinc-300">${label}</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="adjustRating('${key}', -1)"
+                  class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 font-black text-base active:scale-90">
+                  －
+                </button>
+                <div class="flex items-center gap-0.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 h-9 rounded-lg border border-zinc-300 dark:border-zinc-700">
+                  <input type="number" min="0" max="10" inputmode="numeric"
+                    id="rating-input-${key}"
+                    oninput="handleRatingInput('${key}', this.value)"
+                    class="w-7 bg-transparent text-center font-black text-base focus:outline-none text-zinc-900 dark:text-white" />
+                  <span class="text-xs font-extrabold text-zinc-500">/10</span>
+                </div>
+                <button type="button" onclick="adjustRating('${key}', 1)"
+                  class="w-9 h-9 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white font-black text-base active:scale-90">
+                  ＋
+                </button>
+              </div>
             </div>
-            <div class="bus-etas">
-              <div class="eta-first ${arrivingClass}">${firstText}</div>
-              <div class="eta-next">下班: ${nextText}</div>
-            </div>
+            <div class="flex gap-1.5">${quickPresets}</div>
           </div>
         `;
-      }).join('');
+      });
     }
 
-    // 5. 家庭行事曆
-    const DEFAULT_EVENTS = [
-      { id: 1, date: new Date().toISOString().split('T')[0], tag: '家庭', title: '測試家庭行事曆功能' }
+    function adjustRating(key, delta) {
+      const rec = getActiveRecord();
+      const cur = rec[key] !== undefined && rec[key] !== null ? Number(rec[key]) : 8;
+      const next = Math.min(10, Math.max(0, cur + delta));
+      setRating(key, next);
+    }
+
+    function handleRatingInput(key, rawVal) {
+      if (rawVal === '') return;
+      let num = parseInt(rawVal, 10);
+      if (isNaN(num)) return;
+      if (num > 10) num = 10;
+      if (num < 0) num = 0;
+      setRating(key, num);
+    }
+
+    function setRating(key, val) {
+      const rec = getActiveRecord();
+      rec[key] = val;
+      updateRatingVisuals(key);
+      saveToStorage();
+    }
+
+    function updateRatingVisuals(key) {
+      const rec = getActiveRecord();
+      const val = rec[key] !== undefined && rec[key] !== null ? Number(rec[key]) : 8;
+      const inputEl = document.getElementById(`rating-input-${key}`);
+      if (inputEl && document.activeElement !== inputEl) {
+        inputEl.value = val;
+      }
+      if (inputEl) {
+        inputEl.className = val <= 5
+          ? 'w-7 bg-transparent text-center font-black text-sm focus:outline-none text-red-600 dark:text-red-400'
+          : 'w-7 bg-transparent text-center font-black text-sm focus:outline-none text-emerald-700 dark:text-emerald-400';
+      }
+
+      document.querySelectorAll(`[data-rating-key="${key}"]`).forEach(btn => {
+        const bVal = Number(btn.getAttribute('data-rating-val'));
+        if (bVal === val) {
+          btn.className = val <= 5
+            ? 'flex-1 h-9 rounded-lg text-xs font-black bg-red-600 text-white border-red-600 shadow-xs active:scale-95'
+            : 'flex-1 h-9 rounded-lg text-xs font-black bg-zinc-900 dark:bg-pro-accent text-white border-zinc-900 dark:border-pro-accent shadow-xs active:scale-95';
+        } else {
+          btn.className = 'flex-1 h-9 rounded-lg text-xs font-bold bg-zinc-50 dark:bg-zinc-800/70 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 active:scale-95';
+        }
+      });
+    }
+
+    // ==========================================
+    // 4C. 親生兄弟姊妹多項組合快選器 (SIBLINGS BUILDER)
+    // ==========================================
+    const SIBLING_ROLES = ['哥哥', '弟弟', '姐姐', '妹妹'];
+    const SIBLING_STATUSES = ['單身', '+BF', '+GF', '已婚'];
+    const SIBLING_KIDS = [
+      { val: 0, label: '無小朋友' },
+      { val: 1, label: '+1小朋友' },
+      { val: 2, label: '+2小朋友' },
+      { val: 3, label: '+3小朋友' }
     ];
 
-    function loadEvents() {
-      const saved = localStorage.getItem('family_retro_events');
-      const events = saved ? JSON.parse(saved) : DEFAULT_EVENTS;
-      events.sort((a, b) => new Date(a.date) - new Date(b.date));
+    function renderSiblingsBuilders() {
+      ['bride', 'groom'].forEach(side => {
+        const container = document.getElementById(`siblings-builder-${side}`);
+        if (!container) return;
 
-      document.getElementById('event-count').innerText = `${events.length} 項`;
-      const listEl = document.getElementById('event-list');
+        const title = side === 'bride' ? '15. 親生兄弟姊妹 (女家)' : '15. 親生兄弟姊妹 (男家)';
+        container.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">${title}</label>
+              <button type="button" onclick="setOnlyChild('${side}')" class="text-[11px] font-bold px-2 py-0.5 rounded bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-300">
+                設為獨生
+              </button>
+            </div>
 
-      if (events.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; padding: 20px; color:#803d00;">暫無日程記錄</div>';
+            <!-- 已新增的兄弟姊妹列表 -->
+            <div id="siblings-rows-${side}" class="space-y-2"></div>
+
+            <!-- 快速新增按鈕列 -->
+            <div class="grid grid-cols-4 gap-1.5 pt-0.5">
+              ${SIBLING_ROLES.map(role => `
+                <button type="button" onclick="addSiblingRow('${side}', '${role}')"
+                  class="py-2.5 px-2 rounded-xl text-xs font-extrabold bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-zinc-800 dark:text-zinc-100 hover:border-pro-accent active:scale-95 transition flex items-center justify-center gap-0.5 shadow-2xs">
+                  <span class="text-pro-accent">＋</span><span>${role}</span>
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- 額外自由補充輸入 -->
+            <input type="text" id="siblings-note-${side}"
+              oninput="updateSiblingsNote('${side}', this.value)"
+              placeholder="自由補充（例如：細妹帶埋BB、家姐做證婚人）"
+              class="w-full rounded-xl bg-white/90 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent" />
+          </div>
+        `;
+      });
+    }
+
+    function renderSiblingRowsUI(side) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      if (!Array.isArray(rec[listKey])) rec[listKey] = [];
+
+      const rowsContainer = document.getElementById(`siblings-rows-${side}`);
+      const noteEl = document.getElementById(`siblings-note-${side}`);
+      if (noteEl && document.activeElement !== noteEl) {
+        noteEl.value = rec[noteKey] || '';
+      }
+      if (!rowsContainer) return;
+
+      if (rec[listKey].length === 0) {
+        const isOnly = (rec[noteKey] || '').includes('獨生');
+        rowsContainer.innerHTML = `
+          <div class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 bg-white/60 dark:bg-zinc-900/50 rounded-lg px-2.5 py-2 border border-dashed border-zinc-300 dark:border-zinc-700">
+            ${isOnly ? '✅ 已標記為獨生子女（如需新增可按下方按鈕）' : '尚未新增兄弟姊妹，請按下方「＋ 哥哥 / 弟弟 / 姐姐 / 妹妹」快速加入'}
+          </div>
+        `;
         return;
       }
 
-      listEl.innerHTML = events.map(ev => `
-        <div class="event-item">
-          <div>
-            <div class="event-date">${ev.date}</div>
-            <div class="event-title"><span class="tag">${ev.tag}</span>${ev.title}</div>
+      rowsContainer.innerHTML = rec[listKey].map((item, idx) => `
+        <div class="bg-white dark:bg-zinc-900 rounded-xl p-3 border border-zinc-200 dark:border-zinc-700 shadow-2xs space-y-2.5">
+          <div class="flex items-center justify-between gap-1.5">
+            <!-- 稱謂選擇 -->
+            <div class="flex items-center gap-1 flex-wrap">
+              <span class="text-xs font-black text-zinc-400 mr-0.5">#${idx + 1}</span>
+              ${SIBLING_ROLES.map(r => `
+                <button type="button" onclick="updateSiblingItem('${side}', ${idx}, 'role', '${r}')"
+                  class="px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition active:scale-95 ${item.role === r ? 'bg-zinc-900 dark:bg-pro-accent text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'}">
+                  ${r}
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- 刪除該位 -->
+            <button type="button" onclick="removeSiblingRow('${side}', ${idx})" title="移除此位"
+              class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-black text-sm flex items-center justify-center hover:bg-rose-100 shrink-0">
+              ✕
+            </button>
           </div>
-          <button class="del-btn" onclick="deleteEvent(${ev.id})">✕</button>
+
+          <!-- 感情狀況 & 小朋友數量 -->
+          <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <div class="grid grid-cols-4 gap-1.5">
+              ${SIBLING_STATUSES.map(st => `
+                <button type="button" onclick="updateSiblingItem('${side}', ${idx}, 'status', '${st}')"
+                  class="py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${item.status === st ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'}">
+                  ${st}
+                </button>
+              `).join('')}
+            </div>
+
+            <div class="grid grid-cols-4 gap-1.5">
+              ${SIBLING_KIDS.map(k => `
+                <button type="button" onclick="updateSiblingItem('${side}', ${idx}, 'kids', ${k.val})"
+                  class="py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${Number(item.kids || 0) === k.val ? 'bg-amber-500 text-white border-amber-500' : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}">
+                  ${k.val === 0 ? '無仔女' : '+' + k.val + '小朋友'}
+                </button>
+              `).join('')}
+            </div>
+          </div>
         </div>
       `).join('');
     }
 
-    function addEvent() {
-      const dateInput = document.getElementById('event-date');
-      const tagInput = document.getElementById('event-tag');
-      const titleInput = document.getElementById('event-title');
+    function addSiblingRow(side, defaultRole = '姐姐') {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      if (!Array.isArray(rec[listKey])) rec[listKey] = [];
+      if (rec[noteKey] === '獨生') rec[noteKey] = '';
 
-      if (!dateInput.value || !titleInput.value.trim()) {
-        alert('請選擇日期並輸入事項內容');
-        return;
+      rec[listKey].push({
+        role: defaultRole,
+        status: '單身',
+        kids: 0
+      });
+      renderSiblingRowsUI(side);
+      saveToStorage();
+    }
+
+    function removeSiblingRow(side, idx) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      rec[listKey].splice(idx, 1);
+      renderSiblingRowsUI(side);
+      saveToStorage();
+    }
+
+    function updateSiblingItem(side, idx, field, val) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      if (rec[listKey] && rec[listKey][idx]) {
+        rec[listKey][idx][field] = val;
+        renderSiblingRowsUI(side);
+        saveToStorage();
       }
+    }
 
-      const saved = localStorage.getItem('family_retro_events');
-      const events = saved ? JSON.parse(saved) : DEFAULT_EVENTS;
+    function setOnlyChild(side) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      rec[listKey] = [];
+      rec[noteKey] = '獨生';
+      renderSiblingRowsUI(side);
+      saveToStorage();
+    }
 
-      events.push({
-        id: Date.now(),
-        date: dateInput.value,
-        tag: tagInput.value,
-        title: titleInput.value.trim()
+    function updateSiblingsNote(side, val) {
+      const rec = getActiveRecord();
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      rec[noteKey] = val;
+      saveToStorage();
+    }
+
+    function formatSiblingsSummary(rec, side) {
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      const list = Array.isArray(rec[listKey]) ? rec[listKey] : [];
+      const note = (rec[noteKey] || '').trim();
+
+      const formattedList = list.map(item => {
+        const extras = [];
+        if (item.status) extras.push(item.status);
+        if (Number(item.kids) > 0) extras.push(`+${item.kids}小朋友`);
+        return extras.length > 0 ? `${item.role}(${extras.join(' ')})` : item.role;
       });
 
-      localStorage.setItem('family_retro_events', JSON.stringify(events));
-      titleInput.value = '';
-      loadEvents();
+      const parts = [];
+      if (formattedList.length > 0) parts.push(formattedList.join('、'));
+      if (note) parts.push(note);
+
+      // 兼容舊版儲存格式
+      const legacyKey = side === 'bride' ? 'brideSiblings' : 'groomSiblings';
+      if (parts.length === 0 && rec[legacyKey]) {
+        return formatHybrid(rec[legacyKey], '-');
+      }
+
+      return parts.length > 0 ? parts.join(' | ') : '-';
     }
 
-    function deleteEvent(id) {
-      const saved = localStorage.getItem('family_retro_events');
-      if (!saved) return;
-      const events = JSON.parse(saved).filter(ev => ev.id !== id);
-      localStorage.setItem('family_retro_events', JSON.stringify(events));
-      loadEvents();
+    // ==========================================
+    // 5. 表單雙向綁定與星期計算
+    // ==========================================
+    function bindStandardInputs() {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        el.addEventListener('input', (e) => {
+          const field = e.target.getAttribute('data-field');
+          const rec = getActiveRecord();
+          rec[field] = e.target.value;
+          if (field === 'weddingDate') {
+            updateWeekdayBadge(e.target.value);
+          }
+          saveToStorage();
+        });
+      });
     }
 
-    document.getElementById('event-date').valueAsDate = new Date();
-    loadEvents();
+    function populateFormFromRecord(rec) {
+      if (!rec) return;
+
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const field = el.getAttribute('data-field');
+        el.value = rec[field] || '';
+      });
+      updateWeekdayBadge(rec.weddingDate);
+
+      Object.keys(HYBRID_FIELDS).forEach(key => {
+        if (!rec[key]) rec[key] = { selected: [], custom: '' };
+        updateHybridVisuals(key);
+        const customEl = document.querySelector(`[data-hybrid-custom="${key}"]`);
+        if (customEl) customEl.value = rec[key].custom || '';
+      });
+
+      updatePartyStepperVisuals('bridesmaidsCount');
+      updatePartyStepperVisuals('groomsmenCount');
+
+      Object.keys(RATING_FIELDS).forEach(key => {
+        updateRatingVisuals(key);
+      });
+
+      renderSiblingRowsUI('bride');
+      renderSiblingRowsUI('groom');
+    }
+
+    function getWeekdayZh(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return '';
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      if (isNaN(d.getTime())) return '';
+      const days = ['星期日 (Sun)', '星期一 (Mon)', '星期二 (Tue)', '星期三 (Wed)', '星期四 (Thu)', '星期五 (Fri)', '星期六 (Sat)'];
+      return days[d.getDay()];
+    }
+
+    function updateWeekdayBadge(dateStr) {
+      const badge = document.getElementById('weekday-badge');
+      if (badge) badge.textContent = getWeekdayZh(dateStr);
+    }
+
+    // ==========================================
+    // 6. 速查卡渲染與格式化工具
+    // ==========================================
+    function formatHybrid(obj, fallback = '-') {
+      if (!obj) return fallback;
+      const parts = [];
+      if (Array.isArray(obj.selected) && obj.selected.length > 0) {
+        parts.push(obj.selected.join('、'));
+      }
+      if (obj.custom && obj.custom.trim()) {
+        parts.push(obj.custom.trim());
+      }
+      return parts.length > 0 ? parts.join(' | ') : fallback;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderSummarySheet() {
+      const rec = getActiveRecord();
+      if (!rec) return;
+
+      const weekday = getWeekdayZh(rec.weddingDate);
+      const pkgText = formatHybrid(rec.package, '未定方案');
+      // 兼容舊資料若只有 auspiciousTime
+      const legacyTime = rec.auspiciousTime ? formatHybrid(rec.auspiciousTime, '') : '';
+      const leaveTimeText = formatHybrid(rec.auspiciousLeaveTime, legacyTime || '無吉時');
+      const enterTimeText = formatHybrid(rec.auspiciousEnterTime, '無吉時');
+      const lunchText = formatHybrid(rec.crewLunch, '未定');
+      const dinnerText = formatHybrid(rec.crewDinner, '未定');
+      const parkingText = formatHybrid(rec.parking, '未定');
+      const isNoParking = parkingText.includes('冇車位') || parkingText.includes('自費');
+
+      // 檢查低分家庭關係警告 (已移除冇車位頂部警示)
+      const warnings = [];
+      if (rec.brideParentsRel <= 5) warnings.push(`⚠️ 女家父母關係 ${rec.brideParentsRel}/10`);
+      if (rec.brideSelfParentsRel <= 5) warnings.push(`⚠️ 新娘與父母 ${rec.brideSelfParentsRel}/10`);
+      if (rec.groomParentsRel <= 5) warnings.push(`⚠️ 男家父母關係 ${rec.groomParentsRel}/10`);
+      if (rec.groomSelfParentsRel <= 5) warnings.push(`⚠️ 新郎與父母 ${rec.groomSelfParentsRel}/10`);
+      if ((rec.brideParentsStatus?.selected || []).some(s => s.includes('ONLY') || s.includes('離婚'))) {
+        warnings.push(`⚠️ 女家：${rec.brideParentsStatus.selected.join('/')}`);
+      }
+      if ((rec.groomParentsStatus?.selected || []).some(s => s.includes('ONLY') || s.includes('離婚'))) {
+        warnings.push(`⚠️ 男家：${rec.groomParentsStatus.selected.join('/')}`);
+      }
+
+      const warningBannerHtml = warnings.length > 0 ? `
+        <div class="bg-red-600 text-white px-3.5 py-2 flex flex-wrap items-center gap-2 text-xs font-extrabold">
+          <span class="uppercase tracking-wider bg-black/25 px-1.5 py-0.5 rounded">現場避雷提示</span>
+          ${warnings.map(w => `<span>${escapeHtml(w)}</span>`).join('<span class="opacity-50">|</span>')}
+        </div>
+      ` : '';
+
+      // 拍攝環節彙整
+      const morningItems = [
+        ...(rec.morningSession?.selected || []),
+        ...(rec.morningSession?.custom ? [rec.morningSession.custom] : [])
+      ].filter(x => x !== 'N/A');
+
+      const ceremonyItems = [
+        ...(rec.ceremonyMarchIn?.selected || []),
+        ...(rec.ceremonyMarchIn?.custom ? [rec.ceremonyMarchIn.custom] : []),
+        ...(rec.ceremonyRituals?.selected || []),
+        ...(rec.ceremonyRituals?.custom ? [rec.ceremonyRituals.custom] : [])
+      ].filter(x => x !== 'N/A');
+
+      const banquetItems = [
+        ...(rec.banquetHighlights?.selected || []),
+        ...(rec.banquetHighlights?.custom ? [rec.banquetHighlights.custom] : [])
+      ].filter(x => x !== 'N/A');
+
+      const renderScoreBadge = (score) => {
+        const isLow = Number(score) <= 5;
+        return `<span class="inline-block px-2 py-0.5 rounded-md font-black text-xs sm:text-sm ${isLow ? 'bg-red-600 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white'}">${score}/10</span>`;
+      };
+
+      const brideLocText = formatHybrid(rec.brideLocation);
+      const groomLocText = formatHybrid(rec.groomLocation);
+      const ceremonyText = formatHybrid(rec.ceremonyVenue);
+      const banquetText = formatHybrid(rec.banquetVenue);
+
+      const renderCopyBtn = (text, label) => {
+        if (!text || text === '-') return '';
+        const safeText = escapeHtml(text).replace(/'/g, "\\'");
+        return `
+          <button type="button" onclick="copyQuickText('${safeText}', '${label}')"
+            class="no-print shrink-0 px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-[11px] font-extrabold text-zinc-700 dark:text-zinc-200 active:scale-95 transition shadow-2xs">
+            複製地址
+          </button>
+        `;
+      };
+
+      const html = `
+        <!-- 1. 頂部標題欄 (荒山映像放大字體、移除 CALL SHEET、右上角標註製作日期及時間) -->
+        <div class="bg-zinc-900 text-white p-4">
+          <div class="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-zinc-800">
+            <div class="text-xl sm:text-2xl tracking-wider text-orange-400 font-black">荒山映像</div>
+            <div class="text-[11px] sm:text-xs font-bold text-zinc-400 text-right">
+              製作日期及時間：<span class="text-zinc-200 font-extrabold">${escapeHtml(formatDateTimeZh(rec.updatedAt || Date.now()))}</span>
+            </div>
+          </div>
+
+          <div class="flex items-start justify-between gap-2.5">
+            <div class="min-w-0">
+              <h1 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight break-words">${escapeHtml(rec.coupleName || '未命名新人')}</h1>
+              <div class="text-sm font-bold text-zinc-300 mt-1 flex flex-wrap items-center gap-x-2">
+                <span>📅 ${escapeHtml(rec.weddingDate || '未定日期')}</span>
+                <span class="text-orange-400 font-extrabold">${escapeHtml(weekday)}</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-1.5 shrink-0">
+              <span class="px-3 py-1 rounded-xl bg-pro-accent text-white font-black text-sm tracking-wide shadow">
+                ${escapeHtml(pkgText)}
+              </span>
+              <div class="flex flex-col items-end gap-1">
+                <span class="px-2.5 py-0.5 rounded-lg bg-zinc-800 border border-rose-500/50 text-rose-300 font-extrabold text-xs">
+                  ⏰ 出門吉時：${escapeHtml(leaveTimeText)}
+                </span>
+                <span class="px-2.5 py-0.5 rounded-lg bg-zinc-800 border border-sky-500/50 text-sky-300 font-extrabold text-xs">
+                  ⏰ 入門吉時：${escapeHtml(enterTimeText)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 膳食與車位速覽條 (手機易讀大字) -->
+          <div class="mt-3.5 pt-3 border-t border-zinc-800 grid grid-cols-3 gap-2 text-xs sm:text-sm">
+            <div class="bg-zinc-800/90 rounded-xl px-2.5 py-2">
+              <span class="text-zinc-400 block text-[10px] font-bold">LUNCH</span>
+              <span class="font-extrabold text-white leading-tight block mt-0.5">${escapeHtml(lunchText)}</span>
+            </div>
+            <div class="bg-zinc-800/90 rounded-xl px-2.5 py-2">
+              <span class="text-zinc-400 block text-[10px] font-bold">DINNER</span>
+              <span class="font-extrabold text-white leading-tight block mt-0.5">${escapeHtml(dinnerText)}</span>
+            </div>
+            <div class="${isNoParking ? 'bg-red-900/95 border border-red-400' : 'bg-zinc-800/90'} rounded-xl px-2.5 py-2">
+              <span class="text-zinc-300 block text-[10px] font-bold">泊車車位</span>
+              <span class="font-extrabold leading-tight block mt-0.5 ${isNoParking ? 'text-amber-300' : 'text-white'}">${escapeHtml(parkingText)}</span>
+            </div>
+          </div>
+        </div>
+
+        ${warningBannerHtml}
+
+        <div class="p-3.5 sm:p-4 space-y-4 text-sm">
+
+          <!-- 2. 地點與時間軸卡片 (手機單欄全寬大字 + 一鍵複製地址) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-3">
+            <div class="rounded-2xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-200 dark:border-rose-900/50 p-3.5">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-xs font-extrabold text-rose-700 dark:text-rose-400">📍 出門地點 (女家)</span>
+                ${renderCopyBtn(brideLocText, '女家出門地址')}
+              </div>
+              <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white whitespace-pre-line leading-snug">${escapeHtml(brideLocText)}</div>
+            </div>
+
+            <div class="rounded-2xl bg-sky-50/80 dark:bg-sky-950/25 border border-sky-200 dark:border-sky-900/50 p-3.5">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-xs font-extrabold text-sky-700 dark:text-sky-400">📍 入門地點 (男家)</span>
+                ${renderCopyBtn(groomLocText, '男家入門地址')}
+              </div>
+              <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white whitespace-pre-line leading-snug">${escapeHtml(groomLocText)}</div>
+            </div>
+
+            <div class="rounded-2xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 p-3.5">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400">💍 證婚場地</span>
+                ${renderCopyBtn(ceremonyText, '證婚場地')}
+              </div>
+              <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white leading-snug">${escapeHtml(ceremonyText)}</div>
+            </div>
+
+            <div class="rounded-2xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 p-3.5">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400">🥂 宴會場地及圍數</span>
+                ${renderCopyBtn(banquetText, '宴會場地')}
+              </div>
+              <div class="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white leading-snug">${escapeHtml(banquetText)}</div>
+            </div>
+          </div>
+
+          <!-- 花車與交通 (手機直向清晰分行) -->
+          <div class="rounded-2xl bg-zinc-100/90 dark:bg-zinc-800/90 p-3.5 space-y-2 text-sm">
+            <div class="flex items-start gap-2">
+              <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">🚘 花車：</span>
+              <span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.weddingCar))}</span>
+            </div>
+            <div class="flex items-start gap-2 pt-1.5 border-t border-zinc-200/80 dark:border-zinc-700">
+              <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">🚐 交通：</span>
+              <span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.transport))}</span>
+            </div>
+          </div>
+
+          <!-- 3. 團隊與合作單位速查列 (手機 2 欄大字網格) -->
+          <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-3.5">
+            <div class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase mb-2.5">團隊與單位速查 (Vendors & Crew)</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-sm">
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
+                <span class="text-zinc-500 block text-[11px] font-bold">姊妹 / 兄弟</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.bridesmaidsCount, '0'))}姊妹 / ${escapeHtml(formatHybrid(rec.groomsmenCount, '0'))}兄弟</span>
+              </div>
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
+                <span class="text-zinc-500 block text-[11px] font-bold">Video Team</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.videoTeam))}</span>
+              </div>
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
+                <span class="text-zinc-500 block text-[11px] font-bold">化妝師 MUA</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(rec.mua || '-')}</span>
+              </div>
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
+                <span class="text-zinc-500 block text-[11px] font-bold">MC 司儀</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.mc))}</span>
+              </div>
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
+                <span class="text-zinc-500 block text-[11px] font-bold">大妗姐</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.daiKam))}</span>
+              </div>
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
+                <span class="text-zinc-500 block text-[11px] font-bold">律師</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.celebrant))}</span>
+              </div>
+              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl col-span-2">
+                <span class="text-zinc-500 block text-[11px] font-bold">DECO 佈置</span>
+                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.deco))}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 雙方家庭與服裝對照表 (手機改為上下全寬大字卡片，徹底告別雙欄擠迫) -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase">雙方家庭與敬茶細節</span>
+              <div class="no-print md:hidden flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg text-xs font-extrabold">
+                <button type="button" onclick="toggleSummaryFamily('all')" id="sum-fam-all" class="px-2.5 py-1 rounded bg-zinc-900 dark:bg-pro-accent text-white">全部</button>
+                <button type="button" onclick="toggleSummaryFamily('bride')" id="sum-fam-bride" class="px-2.5 py-1 rounded text-rose-600 dark:text-rose-400">女家</button>
+                <button type="button" onclick="toggleSummaryFamily('groom')" id="sum-fam-groom" class="px-2.5 py-1 rounded text-sky-600 dark:text-sky-400">男家</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-3">
+              <!-- 女家欄 -->
+              <div id="sum-card-bride" class="rounded-2xl border-2 border-rose-200 dark:border-rose-900/60 overflow-hidden">
+                <div class="bg-rose-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
+                  <span>👰 女家 (BRIDE)</span>
+                  <span class="bg-black/20 px-2 py-0.5 rounded text-xs">敬茶：${escapeHtml(formatHybrid(rec.brideTeaSets))}</span>
+                </div>
+                <div class="p-3.5 space-y-2 text-sm bg-rose-50/40 dark:bg-rose-950/15">
+                  <div><span class="text-zinc-500 font-bold">出門服裝：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.brideAttire))}</span></div>
+                  <div><span class="text-zinc-500 font-bold">家庭狀況：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.brideParentsStatus))}</span></div>
+                  <div class="flex flex-wrap items-center gap-2 py-1 border-y border-rose-100 dark:border-rose-900/40">
+                    <div><span class="text-zinc-500 font-bold">父母間：</span>${renderScoreBadge(rec.brideParentsRel)}</div>
+                    <div><span class="text-zinc-500 font-bold">女與父母：</span>${renderScoreBadge(rec.brideSelfParentsRel)}</div>
+                  </div>
+                  <div><span class="text-zinc-500 font-bold">兄弟姊妹：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatSiblingsSummary(rec, 'bride'))}</span></div>
+                  <div><span class="text-zinc-500 font-bold">祖父母：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.brideGrandparents))}</span></div>
+                </div>
+              </div>
+
+              <!-- 男家欄 -->
+              <div id="sum-card-groom" class="rounded-2xl border-2 border-sky-200 dark:border-sky-900/60 overflow-hidden">
+                <div class="bg-sky-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
+                  <span>🤵 男家 (GROOM)</span>
+                  <span class="bg-black/20 px-2 py-0.5 rounded text-xs">敬茶：${escapeHtml(formatHybrid(rec.groomTeaSets))}</span>
+                </div>
+                <div class="p-3.5 space-y-2 text-sm bg-sky-50/40 dark:bg-sky-950/15">
+                  <div><span class="text-zinc-500 font-bold">出門服裝：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.groomAttire))}</span></div>
+                  <div><span class="text-zinc-500 font-bold">家庭狀況：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.groomParentsStatus))}</span></div>
+                  <div class="flex flex-wrap items-center gap-2 py-1 border-y border-sky-100 dark:border-sky-900/40">
+                    <div><span class="text-zinc-500 font-bold">父母間：</span>${renderScoreBadge(rec.groomParentsRel)}</div>
+                    <div><span class="text-zinc-500 font-bold">仔與父母：</span>${renderScoreBadge(rec.groomSelfParentsRel)}</div>
+                  </div>
+                  <div><span class="text-zinc-500 font-bold">兄弟姊妹：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatSiblingsSummary(rec, 'groom'))}</span></div>
+                  <div><span class="text-zinc-500 font-bold">祖父母：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.groomGrandparents))}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          ${rec.familyRemark && rec.familyRemark.trim() ? `
+            <div class="rounded-2xl bg-amber-50 dark:bg-amber-950/35 border border-amber-300 dark:border-amber-800 p-3.5 text-sm">
+              <span class="font-extrabold text-amber-800 dark:text-amber-300 block mb-0.5">⚠️ 家庭特別備註：</span>
+              <span class="font-bold text-zinc-900 dark:text-white">${escapeHtml(rec.familyRemark)}</span>
+            </div>
+          ` : ''}
+
+          <!-- 5. 拍攝環節 Checklist (大標籤易讀設計) -->
+          <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-3.5 space-y-3">
+            <div class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase">拍攝環節 Checklist</div>
+
+            <div class="space-y-3 text-sm">
+              <div>
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">🌅 早上環節</span>
+                <div class="flex flex-wrap gap-1.5">
+                  ${morningItems.length > 0
+                    ? morningItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">☑ ${escapeHtml(i)}</span>`).join('')
+                    : '<span class="text-zinc-400 text-xs">無特別指定</span>'}
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">💒 證婚儀式</span>
+                <div class="flex flex-wrap gap-1.5">
+                  ${ceremonyItems.length > 0
+                    ? ceremonyItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">☑ ${escapeHtml(i)}</span>`).join('')
+                    : '<span class="text-zinc-400 text-xs">無特別指定</span>'}
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <span class="inline-block px-2.5 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 font-extrabold text-xs mb-1.5">🎉 晚宴環節</span>
+                <div class="flex flex-wrap gap-1.5">
+                  ${banquetItems.length > 0
+                    ? banquetItems.map(i => `<span class="px-2.5 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 font-extrabold text-xs sm:text-sm">☑ ${escapeHtml(i)}</span>`).join('')
+                    : '<span class="text-zinc-400 text-xs">無特別指定</span>'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          ${rec.generalNotes && rec.generalNotes.trim() ? `
+            <div class="rounded-2xl bg-zinc-900 text-white p-4 text-sm">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-orange-400 mb-1">📌 攝影師全日特別備註 / MUST-SHOT</div>
+              <div class="whitespace-pre-line font-semibold leading-relaxed">${escapeHtml(rec.generalNotes)}</div>
+            </div>
+          ` : ''}
+
+        </div>
+      `;
+
+      document.getElementById('summary-card').innerHTML = html;
+    }
+
+    function copyQuickText(text, label) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(`已複製${label}`);
+      } catch (err) {
+        showToast('複製失敗');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function toggleSummaryFamily(mode) {
+      const brideCard = document.getElementById('sum-card-bride');
+      const groomCard = document.getElementById('sum-card-groom');
+      const bAll = document.getElementById('sum-fam-all');
+      const bBride = document.getElementById('sum-fam-bride');
+      const bGroom = document.getElementById('sum-fam-groom');
+      if (!brideCard || !groomCard) return;
+
+      bAll.className = 'px-2.5 py-1 rounded text-zinc-600 dark:text-zinc-300';
+      bBride.className = 'px-2.5 py-1 rounded text-rose-600 dark:text-rose-400';
+      bGroom.className = 'px-2.5 py-1 rounded text-sky-600 dark:text-sky-400';
+
+      if (mode === 'bride') {
+        brideCard.classList.remove('hidden');
+        groomCard.classList.add('hidden', 'md:block');
+        bBride.className = 'px-2.5 py-1 rounded bg-rose-600 text-white';
+      } else if (mode === 'groom') {
+        brideCard.classList.add('hidden', 'md:block');
+        groomCard.classList.remove('hidden');
+        bGroom.className = 'px-2.5 py-1 rounded bg-sky-600 text-white';
+      } else {
+        brideCard.classList.remove('hidden');
+        groomCard.classList.remove('hidden', 'md:block');
+        bAll.className = 'px-2.5 py-1 rounded bg-zinc-900 dark:bg-pro-accent text-white';
+      }
+    }
+
+    function toggleTab() {
+      if (appState.activeTab === 'form') {
+        switchTab('summary');
+      } else if (appState.activeTab === 'summary') {
+        switchTab('export');
+      } else {
+        switchTab('form');
+      }
+    }
+
+    function switchTab(tab) {
+      appState.activeTab = tab;
+      const formView = document.getElementById('form-view');
+      const summaryView = document.getElementById('summary-view');
+      const exportView = document.getElementById('export-view');
+      const mobileNav = document.getElementById('mobile-section-nav');
+      const btnForm = document.getElementById('tab-btn-form');
+      const btnSummary = document.getElementById('tab-btn-summary');
+      const btnExport = document.getElementById('tab-btn-export');
+      const floatingText = document.getElementById('floating-btn-text');
+
+      const activeTabCls = 'py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-pro-darkCard text-zinc-900 dark:text-white shadow-sm flex items-center justify-center gap-1';
+      const inactiveTabCls = 'py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1';
+
+      formView.classList.add('hidden');
+      summaryView.classList.add('hidden');
+      if (exportView) exportView.classList.add('hidden');
+      if (mobileNav) mobileNav.classList.add('hidden');
+
+      btnForm.className = inactiveTabCls;
+      btnSummary.className = inactiveTabCls;
+      if (btnExport) btnExport.className = inactiveTabCls;
+
+      if (tab === 'summary') {
+        renderSummarySheet();
+        summaryView.classList.remove('hidden');
+        btnSummary.className = activeTabCls;
+        if (floatingText) floatingText.textContent = '下一步：整合試算表紀錄匯出';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'export') {
+        renderSpreadsheetExport();
+        if (exportView) exportView.classList.remove('hidden');
+        if (btnExport) btnExport.className = activeTabCls;
+        if (floatingText) floatingText.textContent = '返回修改：手機輸入表單';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        formView.classList.remove('hidden');
+        if (mobileNav) mobileNav.classList.remove('hidden');
+        btnForm.className = activeTabCls;
+        if (floatingText) floatingText.textContent = '生成並檢視：攝影師一頁速查卡';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function formatDateTimeZh(ts) {
+      const d = new Date(ts || Date.now());
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+    }
+
+    // ==========================================
+    // 7B. 試算表紀錄整合與複製 (SPREADSHEET EXPORT)
+    // ==========================================
+    function getSpreadsheetColumns(rec) {
+      const legacyTime = rec.auspiciousTime ? formatHybrid(rec.auspiciousTime, '') : '';
+      const leaveTimeText = formatHybrid(rec.auspiciousLeaveTime, legacyTime || '');
+      const enterTimeText = formatHybrid(rec.auspiciousEnterTime, '');
+
+      const sanitizeCell = (val) => {
+        if (val === null || val === undefined || val === '-') return '';
+        return String(val).replace(/[\r\n\t]+/g, ' ').trim();
+      };
+
+      const cols = [
+        { header: '製作日期時間', value: formatDateTimeZh(rec.updatedAt || Date.now()) },
+        { header: '新人名字', value: rec.coupleName || '' },
+        { header: '婚禮日期', value: rec.weddingDate || '' },
+        { header: '星期', value: getWeekdayZh(rec.weddingDate) },
+        { header: '服務方案', value: formatHybrid(rec.package, '') },
+        { header: '出門吉時', value: leaveTimeText },
+        { header: '入門吉時', value: enterTimeText },
+        { header: '出門地點(女家)', value: formatHybrid(rec.brideLocation, '') },
+        { header: '入門地點(男家)', value: formatHybrid(rec.groomLocation, '') },
+        { header: '證婚場地', value: formatHybrid(rec.ceremonyVenue, '') },
+        { header: '宴會場地及圍數', value: formatHybrid(rec.banquetVenue, '') },
+        { header: '姊妹人數', value: formatHybrid(rec.bridesmaidsCount, '0') },
+        { header: '兄弟人數', value: formatHybrid(rec.groomsmenCount, '0') },
+        { header: 'Video Team', value: formatHybrid(rec.videoTeam, '') },
+        { header: 'MC司儀', value: formatHybrid(rec.mc, '') },
+        { header: '大妗姐', value: formatHybrid(rec.daiKam, '') },
+        { header: '化妝師MUA', value: rec.mua || '' },
+        { header: '律師', value: formatHybrid(rec.celebrant, '') },
+        { header: 'DECO', value: formatHybrid(rec.deco, '') },
+        { header: '花車', value: formatHybrid(rec.weddingCar, '') },
+        { header: '女家出門服裝', value: formatHybrid(rec.brideAttire, '') },
+        { header: '女家敬茶組合', value: formatHybrid(rec.brideTeaSets, '') },
+        { header: '女家家庭關係', value: formatHybrid(rec.brideParentsStatus, '') },
+        { header: '女家父母間評分', value: `${rec.brideParentsRel}/10` },
+        { header: '新娘與父母評分', value: `${rec.brideSelfParentsRel}/10` },
+        { header: '女家兄弟姊妹', value: formatSiblingsSummary(rec, 'bride') === '-' ? '' : formatSiblingsSummary(rec, 'bride') },
+        { header: '女家祖父母', value: formatHybrid(rec.brideGrandparents, '') },
+        { header: '男家出門服裝', value: formatHybrid(rec.groomAttire, '') },
+        { header: '男家敬茶組合', value: formatHybrid(rec.groomTeaSets, '') },
+        { header: '男家家庭關係', value: formatHybrid(rec.groomParentsStatus, '') },
+        { header: '男家父母間評分', value: `${rec.groomParentsRel}/10` },
+        { header: '新郎與父母評分', value: `${rec.groomSelfParentsRel}/10` },
+        { header: '男家兄弟姊妹', value: formatSiblingsSummary(rec, 'groom') === '-' ? '' : formatSiblingsSummary(rec, 'groom') },
+        { header: '男家祖父母', value: formatHybrid(rec.groomGrandparents, '') },
+        { header: '家庭特別備註', value: rec.familyRemark || '' },
+        { header: 'Crew Lunch', value: formatHybrid(rec.crewLunch, '') },
+        { header: 'Crew Dinner', value: formatHybrid(rec.crewDinner, '') },
+        { header: '團隊交通', value: formatHybrid(rec.transport, '') },
+        { header: '泊車車位', value: formatHybrid(rec.parking, '') },
+        { header: '早上攝影環節', value: formatHybrid(rec.morningSession, '') },
+        { header: '證婚進場', value: formatHybrid(rec.ceremonyMarchIn, '') },
+        { header: '證婚儀式', value: formatHybrid(rec.ceremonyRituals, '') },
+        { header: '晚宴環節', value: formatHybrid(rec.banquetHighlights, '') },
+        { header: '全日特別備註', value: rec.generalNotes || '' }
+      ];
+
+      return cols.map(c => ({
+        header: c.header,
+        value: sanitizeCell(c.value)
+      }));
+    }
+
+    function renderSpreadsheetExport() {
+      const rec = getActiveRecord();
+      if (!rec) return;
+
+      const cols = getSpreadsheetColumns(rec);
+      const countEl = document.getElementById('export-col-count');
+      if (countEl) countEl.textContent = `共 ${cols.length} 個欄位`;
+
+      const tableHtml = `
+        <table class="min-w-max border-collapse text-xs text-left">
+          <thead>
+            <tr class="bg-zinc-900 text-white">
+              ${cols.map(c => `<th class="px-3 py-2 font-extrabold border-r border-zinc-700 whitespace-nowrap">${escapeHtml(c.header)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-white dark:bg-zinc-900">
+              ${cols.map(c => `<td class="px-3 py-2.5 font-semibold border-r border-b border-zinc-200 dark:border-zinc-700 whitespace-nowrap text-zinc-800 dark:text-zinc-200">${escapeHtml(c.value || '-')}</td>`).join('')}
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      const previewContainer = document.getElementById('spreadsheet-preview-container');
+      if (previewContainer) previewContainer.innerHTML = tableHtml;
+
+      const tsvRow = cols.map(c => c.value).join('\t');
+      const tsvBox = document.getElementById('spreadsheet-tsv-box');
+      if (tsvBox) tsvBox.value = tsvRow;
+    }
+
+    function copySpreadsheetRow(includeHeader = false) {
+      const rec = getActiveRecord();
+      if (!rec) return;
+
+      const cols = getSpreadsheetColumns(rec);
+      const headerLine = cols.map(c => c.header).join('\t');
+      const valueLine = cols.map(c => c.value).join('\t');
+      const output = includeHeader ? `${headerLine}\n${valueLine}` : valueLine;
+
+      copyQuickText(output, includeHeader ? '標題列及試算表資料（可直接貼上 Excel / Google Sheets）' : '試算表單行資料（可直接貼上 Excel / Google Sheets）');
+    }
+
+    // ==========================================
+    // 7C. 清除所有項目確認對話框
+    // ==========================================
+    function confirmClearAllFields() {
+      const m = document.getElementById('clear-confirm-modal');
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
+    }
+
+    function closeClearConfirmModal() {
+      const m = document.getElementById('clear-confirm-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      }
+    }
+
+    function executeClearAllFields() {
+      closeClearConfirmModal();
+      clearCurrentRecord();
+    }
+
+    function copyWhatsAppText() {
+      const rec = getActiveRecord();
+      if (!rec) return;
+
+      const weekday = getWeekdayZh(rec.weddingDate);
+      const legacyTime = rec.auspiciousTime ? formatHybrid(rec.auspiciousTime, '') : '';
+      const leaveTimeText = formatHybrid(rec.auspiciousLeaveTime, legacyTime || '無吉時');
+      const enterTimeText = formatHybrid(rec.auspiciousEnterTime, '無吉時');
+
+      const lines = [
+        `📸 *荒山映像 婚禮攝影開會紀錄*`,
+        `👰🤵 *新人*：${rec.coupleName || '未命名'}`,
+        `📅 *日期*：${rec.weddingDate || '未定'} ${weekday}`,
+        `📦 *方案*：${formatHybrid(rec.package)}`,
+        `⏰ *出門吉時*：${leaveTimeText}`,
+        `⏰ *入門吉時*：${enterTimeText}`,
+        ``,
+        `📍 *出門 (女家)*：${formatHybrid(rec.brideLocation)}`,
+        `📍 *入門 (男家)*：${formatHybrid(rec.groomLocation)}`,
+        `💍 *證婚場地*：${formatHybrid(rec.ceremonyVenue)}`,
+        `🥂 *宴會場地*：${formatHybrid(rec.banquetVenue)}`,
+        ``,
+        `👥 *團隊與單位*`,
+        `• 姊妹/兄弟：${formatHybrid(rec.bridesmaidsCount, '0')}姊妹 / ${formatHybrid(rec.groomsmenCount, '0')}兄弟`,
+        `• Video：${formatHybrid(rec.videoTeam)} | MUA：${rec.mua || '-'}`,
+        `• MC：${formatHybrid(rec.mc)} | 大妗：${formatHybrid(rec.daiKam)} | 律師：${formatHybrid(rec.celebrant)}`,
+        `• 花車：${formatHybrid(rec.weddingCar)}`,
+        ``,
+        `🍱 *膳食與車位*`,
+        `• Lunch：${formatHybrid(rec.crewLunch)} | Dinner：${formatHybrid(rec.crewDinner)}`,
+        `• 交通：${formatHybrid(rec.transport)} | 車位：${formatHybrid(rec.parking)}`,
+        ``,
+        `👰 *女家細節*`,
+        `• 服裝：${formatHybrid(rec.brideAttire)} | 敬茶：${formatHybrid(rec.brideTeaSets)}`,
+        `• 家庭：${formatHybrid(rec.brideParentsStatus)} (父母間 ${rec.brideParentsRel}/10, 女與父母 ${rec.brideSelfParentsRel}/10)`,
+        `• 兄弟姊妹：${formatSiblingsSummary(rec, 'bride')} | 祖父母：${formatHybrid(rec.brideGrandparents)}`,
+        ``,
+        `🤵 *男家細節*`,
+        `• 服裝：${formatHybrid(rec.groomAttire)} | 敬茶：${formatHybrid(rec.groomTeaSets)}`,
+        `• 家庭：${formatHybrid(rec.groomParentsStatus)} (父母間 ${rec.groomParentsRel}/10, 仔與父母 ${rec.groomSelfParentsRel}/10)`,
+        `• 兄弟姊妹：${formatSiblingsSummary(rec, 'groom')} | 祖父母：${formatHybrid(rec.groomGrandparents)}`,
+        rec.familyRemark ? `⚠️ *家庭備註*：${rec.familyRemark}` : '',
+        ``,
+        `🎬 *拍攝環節*`,
+        `• 早上：${formatHybrid(rec.morningSession)}`,
+        `• 證婚：${formatHybrid(rec.ceremonyMarchIn)} / ${formatHybrid(rec.ceremonyRituals)}`,
+        `• 晚宴：${formatHybrid(rec.banquetHighlights)}`,
+        rec.generalNotes ? `📌 *特別備註*：${rec.generalNotes}` : ''
+      ].filter((line, i, arr) => !(line === '' && arr[i - 1] === ''));
+
+      copyQuickText(lines.join('\n'), ' WhatsApp 團隊文字版');
+    }
+
+    function filterFamilySide(side) {
+      const bridePanel = document.getElementById('bride-family-panel');
+      const groomPanel = document.getElementById('groom-family-panel');
+      const tAll = document.getElementById('fam-tab-all');
+      const tBride = document.getElementById('fam-tab-bride');
+      const tGroom = document.getElementById('fam-tab-groom');
+
+      tBride.className = 'py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-rose-700 dark:text-rose-400 transition';
+      tGroom.className = 'py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-sky-700 dark:text-sky-400 transition';
+      tAll.className = 'py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-zinc-600 dark:text-zinc-300 transition';
+
+      if (side === 'bride') {
+        bridePanel.classList.remove('hidden');
+        groomPanel.classList.add('hidden', 'md:block');
+        tBride.className = 'py-2.5 text-xs sm:text-sm font-extrabold rounded-lg bg-rose-600 text-white shadow-sm transition';
+      } else if (side === 'groom') {
+        bridePanel.classList.add('hidden');
+        groomPanel.classList.remove('hidden', 'md:block');
+        tGroom.className = 'py-2.5 text-xs sm:text-sm font-extrabold rounded-lg bg-sky-600 text-white shadow-sm transition';
+      } else {
+        bridePanel.classList.remove('hidden');
+        groomPanel.classList.remove('hidden', 'md:block');
+        tAll.className = 'py-2.5 text-xs sm:text-sm font-extrabold rounded-lg bg-zinc-900 dark:bg-zinc-700 text-white shadow-sm transition';
+      }
+    }
+
+    function renderRecordSelector() {
+      const sel = document.getElementById('record-selector');
+      if (!sel) return;
+      sel.innerHTML = appState.records.map(r => {
+        const label = `${r.coupleName || '未命名新人'} ${r.weddingDate ? '(' + r.weddingDate + ')' : ''}`;
+        return `<option value="${r.id}" ${r.id === appState.activeId ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+      }).join('');
+    }
+
+    function switchRecord(id) {
+      appState.activeId = id;
+      saveToStorage();
+      populateFormFromRecord(getActiveRecord());
+      renderSummarySheet();
+      showToast('已切換新人紀錄');
+    }
+
+    function createNewRecord() {
+      const newRec = getEmptyRecord();
+      appState.records.unshift(newRec);
+      appState.activeId = newRec.id;
+      saveToStorage();
+      populateFormFromRecord(newRec);
+      renderSummarySheet();
+      switchTab('form');
+      showToast('已建立新開會紀錄');
+    }
+
+    function loadSampleDaisyKenny() {
+      const current = getActiveRecord();
+      const sample = getDaisyKennySample(current.id);
+      const idx = appState.records.findIndex(r => r.id === current.id);
+      if (idx >= 0) appState.records[idx] = sample;
+      saveToStorage();
+      populateFormFromRecord(sample);
+      renderSummarySheet();
+      showToast('已載入 Daisy & Kenny 範例資料');
+    }
+
+    function clearCurrentRecord() {
+      const current = getActiveRecord();
+      const blank = getEmptyRecord(current.id);
+      const idx = appState.records.findIndex(r => r.id === current.id);
+      if (idx >= 0) appState.records[idx] = blank;
+      saveToStorage();
+      populateFormFromRecord(blank);
+      renderSummarySheet();
+      showToast('已清空目前表單');
+    }
+
+    function deleteCurrentRecord() {
+      if (appState.records.length <= 1) {
+        clearCurrentRecord();
+        return;
+      }
+      appState.records = appState.records.filter(r => r.id !== appState.activeId);
+      appState.activeId = appState.records[0].id;
+      saveToStorage();
+      populateFormFromRecord(getActiveRecord());
+      renderSummarySheet();
+      showToast('已刪除該份紀錄');
+    }
+
+    function openManageModal() {
+      const m = document.getElementById('manage-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeManageModal() {
+      const m = document.getElementById('manage-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toast-msg');
+      msgEl.textContent = msg;
+      toast.classList.remove('opacity-0');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0');
+      }, 2200);
+    }
+
+    // ==========================================
+    // 9. Dark Mode 暗光模式切換
+    // ==========================================
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      updateThemeIcon();
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      updateThemeIcon();
+      showToast(isDark ? '已切換至現場暗光模式 (Dark Mode)' : '已切換至日間高對比模式');
+    }
+
+    function updateThemeIcon() {
+      const btn = document.getElementById('theme-toggle');
+      const isDark = document.documentElement.classList.contains('dark');
+      btn.innerHTML = isDark
+        ? '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>'
+        : '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>';
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
