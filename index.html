@@ -65,17 +65,17 @@
       background: rgba(156, 163, 175, 0.5);
       border-radius: 9999px;
     }
-    /* 列印專用樣式：1/4 張 A4 紙大小 (A6 規格：105mm × 148mm，方便放口袋/貼器材箱) */
+    /* 列印專用樣式：A5 紙大小 (148mm × 210mm)，確保全部資料完整出齊 */
     @media print {
       @page {
-        size: 105mm 148mm;
-        margin: 3mm;
+        size: A5 portrait;
+        margin: 5mm;
       }
       body {
         background: #FFFFFF !important;
         color: #000000 !important;
-        font-size: 7.5px !important;
-        line-height: 1.2 !important;
+        font-size: 9px !important;
+        line-height: 1.28 !important;
         padding: 0 !important;
         margin: 0 !important;
       }
@@ -86,43 +86,49 @@
         display: block !important;
         padding: 0 !important;
         margin: 0 !important;
-        width: 99mm !important;
-        max-width: 99mm !important;
+        width: 138mm !important;
+        max-width: 138mm !important;
       }
       #summary-card {
         box-shadow: none !important;
-        border: 1px solid #111827 !important;
-        border-radius: 6px !important;
+        border: 1.5px solid #111827 !important;
+        border-radius: 8px !important;
         background: #FFFFFF !important;
         color: #000000 !important;
         padding: 0 !important;
         width: 100% !important;
+        aspect-ratio: auto !important;
+        overflow: visible !important;
       }
       #summary-card > div:first-child {
-        padding: 5px 6px !important;
+        padding: 7px 9px !important;
       }
       #summary-card > div:last-child {
-        padding: 5px 6px !important;
+        padding: 7px 9px !important;
       }
       #summary-card .space-y-4 > :not([hidden]) ~ :not([hidden]),
       #summary-card .space-y-3 > :not([hidden]) ~ :not([hidden]),
       #summary-card .space-y-2 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 3px !important;
+        margin-top: 5px !important;
       }
       #summary-card h1 {
-        font-size: 12px !important;
-        line-height: 1.15 !important;
+        font-size: 16px !important;
+        line-height: 1.2 !important;
       }
       #summary-card .p-3\.5,
       #summary-card .p-4,
       #summary-card .px-3\.5,
       #summary-card .py-2 {
-        padding: 3px 4px !important;
+        padding: 4px 6px !important;
+      }
+      #sum-card-bride,
+      #sum-card-groom {
+        display: block !important;
       }
       .print-grid-2 {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 3px !important;
+        gap: 5px !important;
       }
       .print-text-dark {
         color: #000000 !important;
@@ -458,12 +464,12 @@
 
         <button onclick="window.print()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          <span>列印 / 存為 1/4 A4 (A6) PDF</span>
+          <span>列印 / 存為 A5 PDF</span>
         </button>
       </div>
 
-      <!-- 一頁速查卡片本體 -->
-      <div id="summary-card" style="aspect-ratio: 420 / 594;" class="bg-white dark:bg-pro-darkCard rounded-2xl border-2 border-zinc-900 dark:border-zinc-700 shadow-md overflow-hidden flex flex-col justify-between">
+      <!-- 一頁速查卡片本體 (A5 比例：148 / 210，自動延展確保全部資料出齊) -->
+      <div id="summary-card" style="min-aspect-ratio: 148 / 210;" class="bg-white dark:bg-pro-darkCard rounded-2xl border-2 border-zinc-900 dark:border-zinc-700 shadow-md overflow-visible flex flex-col justify-between">
         <!-- 由 JS 動態渲染精簡排版 -->
       </div>
 
@@ -473,19 +479,52 @@
     <!-- 分頁三：試算表紀錄匯出 (SPREADSHEET EXPORT) -->
     <!-- ========================================== -->
     <div id="export-view" class="hidden space-y-4">
+      <!-- Google 試算表雲端自動同步卡片 -->
+      <div class="bg-white dark:bg-pro-darkCard rounded-2xl p-4 border-2 border-emerald-500/40 dark:border-emerald-700/60 shadow-sm space-y-3.5">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h2 class="font-black text-base text-zinc-900 dark:text-white flex items-center gap-1.5">
+              <span>☁️ 輸出至 Google 試算表保存</span>
+            </h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              貼上您的 Google Apps Script 網址後，即可一鍵將目前紀錄直接寫入 Google 試算表（同新人及日期會自動更新）。
+            </p>
+          </div>
+          <button type="button" onclick="openGasSetupModal()" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs active:scale-95 transition">
+            設定教學 / 程式碼
+          </button>
+        </div>
+
+        <!-- Google Apps Script Web App URL 輸入 -->
+        <div class="space-y-2">
+          <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300">Google Apps Script 網頁應用程式網址 (Web App URL)：</label>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" id="gas-webhook-url" oninput="saveGasUrl(this.value)"
+              placeholder="https://script.google.com/macros/s/....../exec"
+              class="flex-1 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2.5 text-xs sm:text-sm font-mono focus:outline-none focus:border-emerald-500" />
+            <button type="button" id="sync-google-btn" onclick="syncToGoogleSheets()"
+              class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition shrink-0">
+              <span>☁️ 立即同步至 Google 試算表</span>
+            </button>
+          </div>
+          <div id="gas-sync-status" class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400"></div>
+        </div>
+      </div>
+
+      <!-- 備用：手動複製貼上試算表 -->
       <div class="bg-white dark:bg-pro-darkCard rounded-2xl p-4 border border-zinc-200 dark:border-pro-darkBorder shadow-sm space-y-3.5">
         <div class="flex items-start justify-between gap-2">
           <div>
-            <h2 class="font-black text-base text-zinc-900 dark:text-white">📊 試算表紀錄整合 (Excel / Google Sheets)</h2>
+            <h2 class="font-black text-base text-zinc-900 dark:text-white">📊 手動複製貼上試算表 (備用)</h2>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              已將所有開會項目整理為單行橫向欄位格式，複製後直接貼上試算表儲存格即可自動分欄。
+              如未設定自動同步，亦可一鍵複製單行資料後直接貼上 Google Sheets 儲存格。
             </p>
           </div>
         </div>
 
         <!-- 複製操作按鈕群 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <button type="button" onclick="copySpreadsheetRow(false)" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
+          <button type="button" onclick="copySpreadsheetRow(false)" class="py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
             <span>📋 複製單行資料 (貼上試算表)</span>
           </button>
           <button type="button" onclick="copySpreadsheetRow(true)" class="py-3 px-4 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
@@ -528,6 +567,76 @@
   <div id="toast" class="no-print fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-2.5 rounded-full text-xs font-bold shadow-xl opacity-0 pointer-events-none transition-opacity duration-200 flex items-center gap-2">
     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
     <span id="toast-msg">已複製到剪貼簿</span>
+  </div>
+
+  <!-- Google Apps Script 設定教學彈窗 -->
+  <div id="gas-setup-modal" class="no-print fixed inset-0 z-50 bg-black/65 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4">
+    <div class="bg-white dark:bg-pro-darkCard w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl p-4 sm:p-5 border border-zinc-200 dark:border-zinc-700 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+        <h3 class="font-black text-base text-zinc-900 dark:text-white">☁️ Google 試算表自動保存設定教學 (3 分鐘完成)</h3>
+        <button type="button" onclick="closeGasSetupModal()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-white font-bold">✕</button>
+      </div>
+
+      <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+        <li>打開您的 <strong>Google 試算表 (Google Sheets)</strong>，建立一個新的空白試算表（例如命名為「荒山映像婚禮紀錄」）。</li>
+        <li>點選上方選單 <strong>「擴充功能」→「Apps Script」</strong>。</li>
+        <li>清空編輯器內的預設程式碼，貼上以下程式碼並按 <strong>Ctrl+S / Cmd+S</strong> 儲存：</li>
+      </ol>
+
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-extrabold text-zinc-500">Apps Script 程式碼（自動建立標題列並依新人ID更新）：</span>
+          <button type="button" onclick="copyGasScriptCode()" class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-[11px] active:scale-95">
+            📋 一鍵複製程式碼
+          </button>
+        </div>
+        <pre id="gas-script-code" class="p-3 rounded-xl bg-zinc-900 text-emerald-300 text-[11px] font-mono overflow-x-auto leading-normal select-all">function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var payload = JSON.parse(e.postData.contents);
+  var headers = payload.headers;
+  var values = payload.values;
+  var recordId = payload.recordId;
+
+  // 若試算表為空，自動寫入第1列標題列
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['紀錄ID'].concat(headers));
+    sheet.getRange(1, 1, 1, headers.length + 1).setFontWeight('bold').setBackground('#18181b').setFontColor('#ffffff');
+    sheet.setFrozenRows(1);
+  }
+
+  var rowData = [recordId].concat(values);
+  var dataRange = sheet.getDataRange().getValues();
+  var existingRowIndex = -1;
+
+  // 檢查是否已有同一份紀錄ID，若有則直接覆蓋更新該行
+  for (var i = 1; i &lt; dataRange.length; i++) {
+    if (String(dataRange[i][0]) === String(recordId)) {
+      existingRowIndex = i + 1;
+      break;
+    }
+  }
+
+  if (existingRowIndex &gt; 0) {
+    sheet.getRange(existingRowIndex, 1, 1, rowData.length).setValues([rowData]);
+  } else {
+    sheet.appendRow(rowData);
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+      </div>
+
+      <ol start="4" class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+        <li>按右上角藍色按鈕 <strong>「部署」→「新增部署作業」</strong>。</li>
+        <li>類型選擇 <strong>「網頁應用程式 (Web app)」</strong>，「執行身分」選<strong>「我」</strong>，「誰可以存取」務必選<strong>「所有人 (Anyone)」</strong>，然後按「部署」。</li>
+        <li>授權後複製產生的 <strong>網頁應用程式網址（結尾為 `/exec`）</strong>，貼回本頁面的輸入框即可！</li>
+      </ol>
+
+      <div class="pt-2 flex justify-end">
+        <button type="button" onclick="closeGasSetupModal()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 text-white text-xs font-bold">我明白了，關閉</button>
+      </div>
+    </div>
   </div>
 
   <!-- 清除所有項目安全確認彈窗 (替代 confirm) -->
@@ -922,6 +1031,7 @@
     // ==========================================
     const STORAGE_KEY = 'hk_wedding_photo_logs_v2';
     const THEME_KEY = 'hk_wedding_photo_theme_v1';
+    const GAS_URL_KEY = 'hk_wedding_photo_gas_url_v1';
 
     function getEmptyRecord(id) {
       const record = {
@@ -2254,6 +2364,105 @@
       const tsvRow = cols.map(c => c.value).join('\t');
       const tsvBox = document.getElementById('spreadsheet-tsv-box');
       if (tsvBox) tsvBox.value = tsvRow;
+
+      // 載入已儲存的 Google Apps Script 網址
+      const urlInput = document.getElementById('gas-webhook-url');
+      if (urlInput && !urlInput.value) {
+        urlInput.value = localStorage.getItem(GAS_URL_KEY) || '';
+      }
+    }
+
+    function saveGasUrl(val) {
+      localStorage.setItem(GAS_URL_KEY, (val || '').trim());
+    }
+
+    function openGasSetupModal() {
+      const m = document.getElementById('gas-setup-modal');
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
+    }
+
+    function closeGasSetupModal() {
+      const m = document.getElementById('gas-setup-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      }
+    }
+
+    function copyGasScriptCode() {
+      const pre = document.getElementById('gas-script-code');
+      if (!pre) return;
+      copyQuickText(pre.textContent, ' Google Apps Script 程式碼');
+    }
+
+    async function syncToGoogleSheets() {
+      const urlInput = document.getElementById('gas-webhook-url');
+      const statusEl = document.getElementById('gas-sync-status');
+      const btn = document.getElementById('sync-google-btn');
+      const url = (urlInput ? urlInput.value : localStorage.getItem(GAS_URL_KEY) || '').trim();
+
+      if (!url || !url.startsWith('https://script.google.com/')) {
+        showToast('請先貼上有效的 Google Apps Script 網址');
+        if (statusEl) {
+          statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
+          statusEl.textContent = '⚠️ 尚未輸入 Google Apps Script 網址，請按右上角「設定教學 / 程式碼」取得網址。';
+        }
+        return;
+      }
+
+      saveGasUrl(url);
+      const rec = getActiveRecord();
+      if (!rec) return;
+
+      const cols = getSpreadsheetColumns(rec);
+      const payload = {
+        recordId: rec.id,
+        headers: cols.map(c => c.header),
+        values: cols.map(c => c.value)
+      };
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳ 正在傳送至 Google 試算表...</span>';
+      }
+      if (statusEl) {
+        statusEl.className = 'text-xs font-bold text-amber-600 dark:text-amber-400';
+        statusEl.textContent = '正在連線至 Google 試算表...';
+      }
+
+      try {
+        // 使用 no-cors + text/plain 避開 Google Apps Script 跨網域預檢限制
+        await fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const nowStr = formatDateTimeZh(Date.now());
+        if (statusEl) {
+          statusEl.className = 'text-xs font-extrabold text-emerald-600 dark:text-emerald-400';
+          statusEl.textContent = `✅ 已成功輸出至 Google 試算表！（同步時間：${nowStr}）`;
+        }
+        showToast('已成功同步至 Google 試算表！');
+      } catch (err) {
+        console.error('Sync error:', err);
+        if (statusEl) {
+          statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
+          statusEl.textContent = '❌ 同步失敗，請檢查網絡連線或確認 Apps Script 部署權限已設為「所有人」。';
+        }
+        showToast('同步失敗，請檢查網址或網絡');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>☁️ 立即同步至 Google 試算表</span>';
+        }
+      }
     }
 
     function copySpreadsheetRow(includeHeader = false) {
