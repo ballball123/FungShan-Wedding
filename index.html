@@ -1149,7 +1149,7 @@ function doGet(e) {
       const hasValidHeaders = headers.some(h => String(h).trim() === '新人名字');
       let rec = getEmptyRecord(item.recordId || 'rec_sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
 
-      // 若有 _原始資料JSON 且無最新手動修改衝突，先載入完整 JSON
+      // 若有 _原始資料JSON，先載入完整結構
       if (item.rawJson) {
         try {
           const parsed = JSON.parse(item.rawJson);
@@ -1249,7 +1249,10 @@ function doGet(e) {
         });
       }
 
-      if (rec.weddingDate) {
+      // 無論有無 rawJson，若試算表「婚禮日期」儲存格有值，永遠以試算表上的最新日期為準並進行香港時區標準化
+      if (hasValidHeaders && map['婚禮日期']) {
+        rec.weddingDate = normalizeSheetDate(map['婚禮日期']);
+      } else if (rec.weddingDate) {
         rec.weddingDate = normalizeSheetDate(rec.weddingDate);
       }
       return rec;
@@ -2596,108 +2599,6 @@ function doGet(e) {
           btn.innerHTML = '<span>輸出並儲存至 Google 試算表</span>';
         }
       }
-    }
-
-    function buildRecordFromSheetRow(item) {
-      if (item.rawJson) {
-        try {
-          const parsed = JSON.parse(item.rawJson);
-          if (parsed && typeof parsed === 'object') {
-            return Object.assign(getEmptyRecord(item.recordId || parsed.id), parsed);
-          }
-        } catch (e) {
-          console.warn('rawJson parse fallback:', e);
-        }
-      }
-
-      const headers = item.headers || [];
-      const row = item.row || [];
-      const map = {};
-      headers.forEach((h, idx) => {
-        map[String(h).trim()] = row[idx] !== undefined && row[idx] !== null ? String(row[idx]).trim() : '';
-      });
-
-      const rec = getEmptyRecord(item.recordId || 'rec_sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
-      rec.coupleName = map['新人名字'] || '';
-      rec.weddingDate = map['婚禮日期'] ? map['婚禮日期'].slice(0, 10) : '';
-      rec.mua = map['化妝師MUA'] || '';
-      rec.familyRemark = map['家庭特別備註'] || '';
-      rec.generalNotes = map['全日特別備註'] || '';
-
-      const parseScore = (str, defVal) => {
-        const m = String(str || '').match(/(\d+)/);
-        return m ? Math.min(10, Math.max(0, parseInt(m[1], 10))) : defVal;
-      };
-      rec.brideParentsRel = parseScore(map['女家父母間評分'], 8);
-      rec.brideSelfParentsRel = parseScore(map['新娘與父母評分'], 8);
-      rec.groomParentsRel = parseScore(map['男家父母間評分'], 8);
-      rec.groomSelfParentsRel = parseScore(map['新郎與父母評分'], 8);
-
-      if (map['女家兄弟姊妹']) rec.brideSiblingsNote = map['女家兄弟姊妹'];
-      if (map['男家兄弟姊妹']) rec.groomSiblingsNote = map['男家兄弟姊妹'];
-
-      const headerToHybridKey = {
-        '服務方案': 'package',
-        '出門吉時': 'auspiciousLeaveTime',
-        '入門吉時': 'auspiciousEnterTime',
-        '出門地點(女家)': 'brideLocation',
-        '入門地點(男家)': 'groomLocation',
-        '證婚場地': 'ceremonyVenue',
-        '宴會場地及圍數': 'banquetVenue',
-        '姊妹人數': 'bridesmaidsCount',
-        '兄弟人數': 'groomsmenCount',
-        'Video Team': 'videoTeam',
-        'MC司儀': 'mc',
-        '大妗姐': 'daiKam',
-        '律師': 'celebrant',
-        'DECO': 'deco',
-        '花車': 'weddingCar',
-        '女家出門服裝': 'brideAttire',
-        '女家敬茶組合': 'brideTeaSets',
-        '女家家庭關係': 'brideParentsStatus',
-        '女家祖父母': 'brideGrandparents',
-        '男家出門服裝': 'groomAttire',
-        '男家敬茶組合': 'groomTeaSets',
-        '男家家庭關係': 'groomParentsStatus',
-        '男家祖父母': 'groomGrandparents',
-        'Crew Lunch': 'crewLunch',
-        'Crew Dinner': 'crewDinner',
-        '團隊交通': 'transport',
-        '泊車車位': 'parking',
-        '早上的士': 'morningTaxi',
-        '早上攝影環節': 'morningSession',
-        '證婚進場': 'ceremonyMarchIn',
-        '證婚儀式': 'ceremonyRituals',
-        '午宴或晚宴環節': 'banquetHighlights'
-      };
-
-      Object.entries(headerToHybridKey).forEach(([colHeader, fieldKey]) => {
-        const rawVal = map[colHeader];
-        if (!rawVal) return;
-        const cfg = HYBRID_FIELDS[fieldKey];
-        const parts = rawVal.split('|').map(s => s.trim()).filter(Boolean);
-        const matchedOpts = [];
-        const customParts = [];
-
-        parts.forEach(part => {
-          const subItems = part.split('、').map(s => s.trim()).filter(Boolean);
-          const allArePreset = subItems.length > 0 && subItems.every(si => cfg.options.includes(si));
-          if (allArePreset) {
-            subItems.forEach(si => {
-              if (!matchedOpts.includes(si)) matchedOpts.push(si);
-            });
-          } else {
-            customParts.push(part);
-          }
-        });
-
-        rec[fieldKey] = {
-          selected: matchedOpts,
-          custom: customParts.join(' | ')
-        };
-      });
-
-      return rec;
     }
 
     function fetchJsonpFromGas(url) {
