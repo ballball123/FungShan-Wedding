@@ -593,9 +593,12 @@
   }
 
   if (existingRowIndex &gt; 0) {
-    sheet.getRange(existingRowIndex, 1, 1, rowData.length).setValues([rowData]);
+    var range = sheet.getRange(existingRowIndex, 1, 1, rowData.length);
+    range.setNumberFormat('@');
+    range.setValues([rowData]);
   } else {
     sheet.appendRow(rowData);
+    sheet.getRange(sheet.getLastRow(), 1, 1, rowData.length).setNumberFormat('@');
   }
 
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
@@ -612,12 +615,19 @@ function doGet(e) {
     payload = JSON.stringify({ status: 'ok', records: [] });
   } else {
     var data = sheet.getDataRange().getDisplayValues();
+    var rawData = sheet.getDataRange().getValues();
     var headers = data[0];
     var records = [];
 
     for (var i = 1; i &lt; data.length; i++) {
       var row = data[i];
+      var rawRow = rawData[i];
       if (!row[0] &amp;&amp; !row[2]) continue;
+      for (var c = 0; c &lt; rawRow.length; c++) {
+        if (Object.prototype.toString.call(rawRow[c]) === '[object Date]' &amp;&amp; !isNaN(rawRow[c].getTime())) {
+          row[c] = Utilities.formatDate(rawRow[c], 'Asia/Hong_Kong', 'yyyy-MM-dd');
+        }
+      }
       var lastCell = String(row[row.length - 1] || '').trim();
       records.push({
         recordId: String(row[0] || ''),
@@ -1118,12 +1128,12 @@ function doGet(e) {
     function normalizeSheetDate(rawDate) {
       if (!rawDate) return '';
       const s = String(rawDate).trim();
-      // 若已是 YYYY-MM-DD 或 YYYY/MM/DD 格式，直接標準化
-      const m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
-      if (m) {
-        return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+      // 1. 若為 YYYY-MM-DD 或 YYYY/MM/DD（後方即使帶有時間亦只取日期部分）
+      const ymd = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[T\s].*)?$/);
+      if (ymd && !s.includes('Z') && !s.includes('GMT')) {
+        return `${ymd[1]}-${ymd[2].padStart(2, '0')}-${ymd[3].padStart(2, '0')}`;
       }
-      // 若為 ISO 時區字串 (例如 2027-01-02T16:00:00.000Z)，轉為香港本地日期 (UTC+8)
+      // 2. 若為帶有 Z 或 GMT 的 UTC 時間字串，加上 8 小時轉為香港本地日期
       const d = new Date(s);
       if (!isNaN(d.getTime())) {
         const hkTime = new Date(d.getTime() + 8 * 60 * 60 * 1000);
