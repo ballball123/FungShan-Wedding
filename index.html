@@ -2853,8 +2853,17 @@ function doGet(e) {
     function renderRecordSelector() {
       const sel = document.getElementById('record-selector');
       if (!sel) return;
-      sel.innerHTML = appState.records.map(r => {
-        const label = `${r.coupleName || '未命名新人'} ${r.weddingDate ? '(' + r.weddingDate + ')' : ''}`;
+      const sortedRecords = [...appState.records].sort((a, b) => {
+        const da = (a.weddingDate || '').trim();
+        const db = (b.weddingDate || '').trim();
+        if (da && db) return da.localeCompare(db);
+        if (da && !db) return -1;
+        if (!da && db) return 1;
+        return 0;
+      });
+      sel.innerHTML = sortedRecords.map(r => {
+        const datePrefix = r.weddingDate ? `${r.weddingDate} - ` : '未定日期 - ';
+        const label = `${datePrefix}${r.coupleName || '未命名新人'}`;
         return `<option value="${r.id}" ${r.id === appState.activeId ? 'selected' : ''}>${escapeHtml(label)}</option>`;
       }).join('');
     }
