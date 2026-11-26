@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>荒山映像 婚禮攝影 | Wedding Call Sheet</title>
+  <title>荒山映像 婚禮攝影</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
               darkBg: '#121316',
               darkCard: '#1C1E24',
               darkBorder: '#2C303A',
-              accent: '#EA580C', // 亮橙色強調重點
+              accent: '#EA580C',
               accentHover: '#C2410C',
               warn: '#DC2626',
             }
@@ -38,7 +38,7 @@
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior-y: contain;
     }
-    /* 防止手機瀏覽器點擊 input/select/textarea 時自動放大畫面 (需 >= 16px) */
+    /* 防止手機瀏覽器點擊 input/select/textarea 時自動放大畫面 */
     @media (max-width: 640px) {
       input[type="text"],
       input[type="date"],
@@ -48,7 +48,6 @@
         font-size: 16px !important;
       }
     }
-    /* 隱藏橫向捲動條但保留滑動功能 */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -56,7 +55,6 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* 自訂捲軸更整潔 */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -130,9 +128,6 @@
         grid-template-columns: 1fr 1fr !important;
         gap: 5px !important;
       }
-      .print-text-dark {
-        color: #000000 !important;
-      }
     }
   </style>
 </head>
@@ -150,12 +145,12 @@
         </h1>
       </div>
       <span class="text-[11px] font-bold text-zinc-400 dark:text-zinc-500 shrink-0 hidden sm:inline">
-        WEDDING CALL SHEET
+        WEDDING PHOTOGRAPHY
       </span>
     </div>
 
     <div class="max-w-3xl mx-auto px-3 py-2 flex items-center justify-between gap-2">
-      <!-- 新人切換器 -->
+      <!-- 新人切換器與雲端讀取 -->
       <div class="flex items-center gap-1.5 min-w-0 flex-1">
         <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">新人檔案：</span>
         <div class="min-w-0 flex-1">
@@ -170,16 +165,15 @@
 
       <!-- 快捷操作按鈕群 -->
       <div class="flex items-center gap-1.5 shrink-0">
-        <button onclick="createNewRecord()" title="新增新人紀錄" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center gap-1">
+        <button type="button" onclick="createNewRecord()" title="新增新人紀錄" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center gap-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4"/></svg>
           <span class="hidden sm:inline">新增</span>
         </button>
 
-        <button onclick="toggleDarkMode()" id="theme-toggle" title="切換暗光模式" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-amber-400">
-          <!-- Sun / Moon icon injected by JS -->
+        <button type="button" onclick="toggleDarkMode()" id="theme-toggle" title="切換暗光模式" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-amber-400">
         </button>
 
-        <button onclick="openManageModal()" title="管理/範例/重設" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200">
+        <button type="button" onclick="openManageModal()" title="管理/範例/重設" class="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
         </button>
       </div>
@@ -188,20 +182,20 @@
     <!-- 分頁標籤 Tab -->
     <div class="max-w-3xl mx-auto px-3 pb-2">
       <div class="grid grid-cols-3 gap-1 bg-zinc-200/80 dark:bg-zinc-900 p-1 rounded-xl">
-        <button id="tab-btn-form" onclick="switchTab('form')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-pro-darkCard text-zinc-900 dark:text-white shadow-sm flex items-center justify-center gap-1">
+        <button type="button" id="tab-btn-form" onclick="switchTab('form')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-pro-darkCard text-zinc-900 dark:text-white shadow-sm flex items-center justify-center gap-1">
           <span>1. 手機輸入</span>
         </button>
-        <button id="tab-btn-summary" onclick="switchTab('summary')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
+        <button type="button" id="tab-btn-summary" onclick="switchTab('summary')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
           <span>2. 速查卡</span>
           <span class="w-1.5 h-1.5 rounded-full bg-pro-accent"></span>
         </button>
-        <button id="tab-btn-export" onclick="switchTab('export')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
+        <button type="button" id="tab-btn-export" onclick="switchTab('export')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
           <span>3. 試算表匯出</span>
         </button>
       </div>
     </div>
 
-    <!-- 手機快速跳轉分區導航列 (僅在輸入表單分頁顯示) -->
+    <!-- 手機快速跳轉分區導航列 -->
     <div id="mobile-section-nav" class="max-w-3xl mx-auto px-3 pb-2 overflow-x-auto no-scrollbar">
       <div class="flex items-center gap-1.5 min-w-max">
         <button type="button" onclick="jumpToSection('sec-basic')" class="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:bg-pro-accent active:text-white text-xs font-extrabold text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
@@ -224,7 +218,7 @@
   <main class="max-w-3xl mx-auto px-3 pt-4">
 
     <!-- ========================================== -->
-    <!-- 分頁一：開會輸入表單 (FORM VIEW)            -->
+    <!-- 分頁一：手機開會輸入表單 (FORM VIEW)         -->
     <!-- ========================================== -->
     <div id="form-view" class="space-y-4">
 
@@ -258,7 +252,6 @@
         </button>
 
         <div id="body-basic" class="px-4 pb-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-3.5">
-          <!-- 1. 新人名字 & 2. 婚禮日期 -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">1. 新人名字 (Name)</label>
@@ -272,34 +265,23 @@
             </div>
           </div>
 
-          <!-- 3. 服務方案 (Hybrid) -->
           <div id="hybrid-package"></div>
 
-          <!-- 4. 出門吉時 & 入門吉時 (Hybrid) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div id="hybrid-auspiciousLeaveTime"></div>
             <div id="hybrid-auspiciousEnterTime"></div>
           </div>
 
-          <!-- 5. 出門地點 (Bride's Location) -->
           <div id="hybrid-brideLocation"></div>
-
-          <!-- 6. 入門地點 (Groom's Location) -->
           <div id="hybrid-groomLocation"></div>
-
-          <!-- 7. 證婚場地及狀態 -->
           <div id="hybrid-ceremonyVenue"></div>
-
-          <!-- 8. 宴會場地及圍數 -->
           <div id="hybrid-banquetVenue"></div>
 
-          <!-- 9. 兄弟姊妹人數 (大拇指步進器) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div id="stepper-bridesmaidsCount"></div>
             <div id="stepper-groomsmenCount"></div>
           </div>
 
-          <!-- 10. 合作單位 (Vendors) -->
           <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-3.5">
             <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">合作單位 (Vendors)</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -329,13 +311,12 @@
         </button>
 
         <div id="body-family" class="px-4 pb-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 pt-3.5">
-          <!-- 手機單手分頁切換女家/男家 (預設優先顯示單邊，減少手機超長捲動) -->
           <div class="grid grid-cols-3 gap-1.5 bg-zinc-100 dark:bg-zinc-900 p-1.5 rounded-xl sticky top-[132px] z-20 shadow-xs border border-zinc-200/70 dark:border-zinc-800">
             <button type="button" onclick="filterFamilySide('bride')" id="fam-tab-bride" class="py-2.5 text-xs sm:text-sm font-extrabold rounded-lg bg-rose-600 text-white shadow-sm transition">
-              👰 女家 (新娘)
+              女家 (新娘)
             </button>
             <button type="button" onclick="filterFamilySide('groom')" id="fam-tab-groom" class="py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-sky-700 dark:text-sky-400 transition">
-              🤵 男家 (新郎)
+              男家 (新郎)
             </button>
             <button type="button" onclick="filterFamilySide('all')" id="fam-tab-all" class="py-2.5 text-xs sm:text-sm font-extrabold rounded-lg text-zinc-600 dark:text-zinc-300 transition">
               雙欄並排
@@ -359,13 +340,11 @@
               <div id="hybrid-brideTeaSets"></div>
               <div id="hybrid-brideParentsStatus"></div>
 
-              <!-- 關係融洽度評分 1-10 (大按鈕加減步進版) -->
               <div class="space-y-3 bg-white/90 dark:bg-zinc-900/90 p-3 rounded-xl border border-rose-100 dark:border-zinc-800">
                 <div id="rating-brideParentsRel"></div>
                 <div id="rating-brideSelfParentsRel"></div>
               </div>
 
-              <!-- 親生兄弟姊妹多項快選器 (女家) -->
               <div id="siblings-builder-bride"></div>
               <div id="hybrid-brideGrandparents"></div>
             </div>
@@ -386,19 +365,16 @@
               <div id="hybrid-groomTeaSets"></div>
               <div id="hybrid-groomParentsStatus"></div>
 
-              <!-- 關係融洽度評分 1-10 (大按鈕加減步進版) -->
               <div class="space-y-3 bg-white/90 dark:bg-zinc-900/90 p-3 rounded-xl border border-sky-100 dark:border-zinc-800">
                 <div id="rating-groomParentsRel"></div>
                 <div id="rating-groomSelfParentsRel"></div>
               </div>
 
-              <!-- 親生兄弟姊妹多項快選器 (男家) -->
               <div id="siblings-builder-groom"></div>
               <div id="hybrid-groomGrandparents"></div>
             </div>
           </div>
 
-          <!-- 17. 家庭特別備註 -->
           <div>
             <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-1.5">17. 家庭特別備註 (Family Remark / 拍攝禁忌或次序)</label>
             <textarea data-field="familyRemark" rows="2" placeholder="例如：女家婆婆行動不便坐輪椅、男家父母分開坐唔好影同框、敬茶次序..." class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base focus:outline-none focus:border-pro-accent"></textarea>
@@ -430,12 +406,12 @@
         </div>
       </section>
 
-      <!-- 區塊四：早上拍攝、證婚及晚宴環節 -->
+      <!-- 區塊四：早上拍攝、證婚及午宴/晚宴環節 -->
       <section id="sec-flow" class="scroll-mt-36 bg-white dark:bg-pro-darkCard rounded-2xl shadow-sm border border-zinc-200/80 dark:border-pro-darkBorder overflow-hidden">
         <button type="button" onclick="toggleSectionBody('body-flow', 'chev-flow')" class="w-full p-4 flex items-center justify-between text-left active:bg-zinc-50 dark:active:bg-zinc-800/50">
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white text-xs font-extrabold">04</span>
-            <h2 class="font-extrabold text-base tracking-tight">早上拍攝、證婚及晚宴環節</h2>
+            <h2 class="font-extrabold text-base tracking-tight">早上拍攝、證婚及午宴或晚宴環節</h2>
           </div>
           <svg id="chev-flow" class="w-5 h-5 text-zinc-400 transition-transform duration-200 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
         </button>
@@ -460,39 +436,37 @@
     <!-- ========================================== -->
     <div id="summary-view" class="hidden space-y-4">
 
-      <!-- 匯出與操作工具列 -->
       <div class="no-print flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-pro-darkCard p-3 rounded-2xl border border-zinc-200 dark:border-pro-darkBorder shadow-sm">
-        <button onclick="copyWhatsAppText()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+        <button type="button" onclick="copyWhatsAppText()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
           <span>複製 WhatsApp 文字版</span>
         </button>
 
-        <button onclick="window.print()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+        <button type="button" onclick="window.print()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
           <span>列印 / 存為 A5 PDF</span>
         </button>
       </div>
 
-      <!-- 一頁速查卡片本體 (A5 比例：148 / 210，自動延展確保全部資料出齊) -->
+      <!-- 一頁速查卡片本體 (A5 尺寸比例，完整出齊所有資料) -->
       <div id="summary-card" style="min-aspect-ratio: 148 / 210;" class="bg-white dark:bg-pro-darkCard rounded-2xl border-2 border-zinc-900 dark:border-zinc-700 shadow-md overflow-visible flex flex-col justify-between">
-        <!-- 由 JS 動態渲染精簡排版 -->
       </div>
 
     </div>
 
     <!-- ========================================== -->
-    <!-- 分頁三：試算表紀錄匯出 (SPREADSHEET EXPORT) -->
+    <!-- 分頁三：試算表紀錄匯出與讀取 (EXPORT VIEW)   -->
     <!-- ========================================== -->
     <div id="export-view" class="hidden space-y-4">
-      <!-- Google 試算表雲端自動同步卡片 -->
+      <!-- Google 試算表雲端雙向同步卡片 -->
       <div class="bg-white dark:bg-pro-darkCard rounded-2xl p-4 border-2 border-emerald-500/40 dark:border-emerald-700/60 shadow-sm space-y-3.5">
         <div class="flex items-start justify-between gap-2">
           <div>
             <h2 class="font-black text-base text-zinc-900 dark:text-white flex items-center gap-1.5">
-              <span>☁️ 輸出至 Google 試算表保存</span>
+              <span>Google 試算表雲端保存與讀取</span>
             </h2>
             <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              貼上您的 Google Apps Script 網址後，即可一鍵將目前紀錄直接寫入 Google 試算表（同新人及日期會自動更新）。
+              貼上您的 Google Apps Script 網址後，即可將紀錄寫入 Google 試算表，或隨時從試算表讀回所有新人檔案。
             </p>
           </div>
           <button type="button" onclick="openGasSetupModal()" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-extrabold text-xs active:scale-95 transition">
@@ -500,7 +474,6 @@
           </button>
         </div>
 
-        <!-- Google Apps Script Web App URL 輸入 -->
         <div class="space-y-2.5">
           <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300">Google Apps Script 網頁應用程式網址 (Web App URL)：</label>
           <input type="text" id="gas-webhook-url" oninput="saveGasUrl(this.value)"
@@ -509,50 +482,44 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button type="button" id="sync-google-btn" onclick="syncToGoogleSheets()"
               class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
-              <span>☁️ 輸出並儲存至 Google 試算表</span>
+              <span>輸出並儲存至 Google 試算表</span>
             </button>
             <button type="button" id="load-google-btn" onclick="loadFromGoogleSheets()"
               class="py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
-              <span>📥 從 Google 試算表讀取全部新人</span>
+              <span>從 Google 試算表讀取全部新人</span>
             </button>
           </div>
-          <div id="gas-sync-status" class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400"></div>
+          <div id="gas-sync-status" class="text-xs font-bold text-zinc-500 dark:text-zinc-400 leading-relaxed"></div>
         </div>
       </div>
 
       <!-- 備用：手動複製貼上試算表 -->
       <div class="bg-white dark:bg-pro-darkCard rounded-2xl p-4 border border-zinc-200 dark:border-pro-darkBorder shadow-sm space-y-3.5">
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            <h2 class="font-black text-base text-zinc-900 dark:text-white">📊 手動複製貼上試算表 (備用)</h2>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              如未設定自動同步，亦可一鍵複製單行資料後直接貼上 Google Sheets 儲存格。
-            </p>
-          </div>
+        <div>
+          <h2 class="font-black text-base text-zinc-900 dark:text-white">手動複製貼上試算表 (備用)</h2>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            亦可一鍵複製單行資料後直接貼上 Excel 或 Google Sheets 儲存格。
+          </p>
         </div>
 
-        <!-- 複製操作按鈕群 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <button type="button" onclick="copySpreadsheetRow(false)" class="py-3 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
-            <span>📋 複製單行資料 (貼上試算表)</span>
+            <span>複製單行資料 (貼上試算表)</span>
           </button>
           <button type="button" onclick="copySpreadsheetRow(true)" class="py-3 px-4 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition">
-            <span>📑 連同標題列一併複製 (首次建表)</span>
+            <span>連同標題列一併複製 (首次建表)</span>
           </button>
         </div>
 
-        <!-- 橫向預覽表格 -->
         <div class="border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden">
           <div class="bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 text-[11px] font-extrabold text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
             <span>橫向欄位預覽 (可左右滑動檢視)</span>
             <span id="export-col-count" class="text-pro-accent"></span>
           </div>
           <div id="spreadsheet-preview-container" class="overflow-x-auto bg-white dark:bg-zinc-900">
-            <!-- 由 JS 動態生成預覽表格 -->
           </div>
         </div>
 
-        <!-- 純文字 TSV 備用框 -->
         <div>
           <label class="block text-xs font-extrabold text-zinc-600 dark:text-zinc-400 mb-1">TSV 純文字備份框（亦可手動全選複製）：</label>
           <textarea id="spreadsheet-tsv-box" readonly rows="3" class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 p-2.5 text-xs font-mono text-zinc-700 dark:text-zinc-300 focus:outline-none"></textarea>
@@ -565,7 +532,7 @@
   <!-- 底部固定懸浮切換按鈕 -->
   <div class="no-print fixed bottom-0 inset-x-0 z-40 bg-gradient-to-t from-pro-bg via-pro-bg/95 to-transparent dark:from-pro-darkBg dark:via-pro-darkBg/95 pt-4 pb-3 px-3 pointer-events-none">
     <div class="max-w-3xl mx-auto flex justify-center pointer-events-auto">
-      <button id="floating-switch-btn" onclick="toggleTab()" class="w-full sm:w-auto sm:min-w-[320px] py-3 px-6 rounded-full bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-95 transition border border-white/10">
+      <button type="button" id="floating-switch-btn" onclick="toggleTab()" class="w-full sm:w-auto sm:min-w-[320px] py-3 px-6 rounded-full bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-95 transition border border-white/10">
         <span id="floating-btn-text">生成並檢視：攝影師一頁速查卡</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
       </button>
@@ -582,21 +549,21 @@
   <div id="gas-setup-modal" class="no-print fixed inset-0 z-50 bg-black/65 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4">
     <div class="bg-white dark:bg-pro-darkCard w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl p-4 sm:p-5 border border-zinc-200 dark:border-zinc-700 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-        <h3 class="font-black text-base text-zinc-900 dark:text-white">☁️ Google 試算表自動保存設定教學 (3 分鐘完成)</h3>
+        <h3 class="font-black text-base text-zinc-900 dark:text-white">Google 試算表雙向保存與讀取設定教學</h3>
         <button type="button" onclick="closeGasSetupModal()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-white font-bold">✕</button>
       </div>
 
       <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
-        <li>打開您的 <strong>Google 試算表 (Google Sheets)</strong>，建立一個新的空白試算表（例如命名為「荒山映像婚禮紀錄」）。</li>
+        <li>打開您的 <strong>Google 試算表 (Google Sheets)</strong>，建立一個空白試算表。</li>
         <li>點選上方選單 <strong>「擴充功能」→「Apps Script」</strong>。</li>
-        <li>清空編輯器內的預設程式碼，貼上以下程式碼並按 <strong>Ctrl+S / Cmd+S</strong> 儲存：</li>
+        <li>清空編輯器內的舊程式碼，貼上以下程式碼並按 <strong>Ctrl+S / Cmd+S</strong> 儲存：</li>
       </ol>
 
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-zinc-500">Apps Script 程式碼（支援雙向寫入及讀取全部新人檔案）：</span>
+          <span class="text-[11px] font-extrabold text-zinc-500">Apps Script 程式碼（支援寫入及 JSONP 跨網域安全讀取）：</span>
           <button type="button" onclick="copyGasScriptCode()" class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-[11px] active:scale-95">
-            📋 一鍵複製程式碼
+            一鍵複製程式碼
           </button>
         </div>
         <pre id="gas-script-code" class="p-3 rounded-xl bg-zinc-900 text-emerald-300 text-[11px] font-mono overflow-x-auto leading-normal select-all">function doPost(e) {
@@ -607,7 +574,6 @@
   var recordId = payload.recordId;
   var rawJson = payload.rawJson || '';
 
-  // 若試算表為空，自動寫入第1列標題列（最後一欄保存完整JSON供手機讀取還原）
   if (sheet.getLastRow() === 0) {
     var fullHeaders = ['紀錄ID'].concat(headers).concat(['_原始資料JSON']);
     sheet.appendRow(fullHeaders);
@@ -619,7 +585,6 @@
   var dataRange = sheet.getDataRange().getValues();
   var existingRowIndex = -1;
 
-  // 檢查是否已有同一份紀錄ID，若有則直接覆蓋更新該行
   for (var i = 1; i &lt; dataRange.length; i++) {
     if (String(dataRange[i][0]) === String(recordId)) {
       existingRowIndex = i + 1;
@@ -639,7 +604,7 @@
 
 function doGet(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var callback = e && e.parameter && e.parameter.callback ? e.parameter.callback : '';
+  var callback = e &amp;&amp; e.parameter &amp;&amp; e.parameter.callback ? e.parameter.callback : '';
   var lastRow = sheet.getLastRow();
   var payload;
 
@@ -676,11 +641,11 @@ function doGet(e) {
       <ol start="4" class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
         <li>按右上角藍色按鈕 <strong>「部署」→「管理部署作業」→ 點選右上角鉛筆圖示編輯 → 版本選「新版本」→「部署」</strong>（首次設定請按「新增部署作業」）。</li>
         <li>類型選擇 <strong>「網頁應用程式 (Web app)」</strong>，「執行身分」選<strong>「我」</strong>，「誰可以存取」務必選<strong>「所有人 (Anyone)」</strong>，然後按「部署」。</li>
-        <li>授權後複製產生的 <strong>網頁應用程式網址（結尾為 `/exec`）</strong>，貼回本頁面的輸入框即可雙向寫入及讀取！</li>
+        <li>複製產生的 <strong>網頁應用程式網址（結尾為 `/exec`）</strong>，貼回本頁面輸入框即可雙向寫入及讀取。</li>
       </ol>
 
       <div class="pt-2 flex justify-end">
-        <button type="button" onclick="closeGasSetupModal()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 text-white text-xs font-bold">我明白了，關閉</button>
+        <button type="button" onclick="closeGasSetupModal()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 text-white text-xs font-bold">關閉</button>
       </div>
     </div>
   </div>
@@ -689,8 +654,8 @@ function doGet(e) {
   <div id="clear-confirm-modal" class="no-print fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-pro-darkCard w-full max-w-sm rounded-2xl p-5 border border-zinc-200 dark:border-zinc-700 shadow-2xl space-y-4">
       <div class="space-y-1.5">
-        <h3 class="font-black text-base text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-          <span>⚠️ 確定清除所有項目？</span>
+        <h3 class="font-black text-base text-rose-600 dark:text-rose-400">
+          確定清除所有項目？
         </h3>
         <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
           此操作將會清空目前新人表單中的所有已填寫與已點選項目，還原為空白表單。
@@ -712,33 +677,33 @@ function doGet(e) {
     <div class="bg-white dark:bg-pro-darkCard w-full max-w-md rounded-2xl p-5 border border-zinc-200 dark:border-zinc-700 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
         <h3 class="font-extrabold text-base">紀錄管理與快捷操作</h3>
-        <button onclick="closeManageModal()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">✕</button>
+        <button type="button" onclick="closeManageModal()" class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">✕</button>
       </div>
 
       <div class="space-y-2.5">
-        <button onclick="createNewRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-left text-sm font-bold flex items-center justify-between">
+        <button type="button" onclick="createNewRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-left text-sm font-bold flex items-center justify-between">
           <span>＋ 新增空白新人紀錄</span>
           <span class="text-xs text-zinc-500">New</span>
         </button>
 
-        <button onclick="loadSampleDaisyKenny(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-pro-accent hover:bg-orange-100 text-left text-sm font-bold flex items-center justify-between">
-          <span>📋 填入「Daisy & Kenny」範例資料</span>
+        <button type="button" onclick="loadSampleDaisyKenny(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-pro-accent hover:bg-orange-100 text-left text-sm font-bold flex items-center justify-between">
+          <span>填入「Daisy & Kenny」範例資料</span>
           <span class="text-xs">Demo</span>
         </button>
 
-        <button onclick="clearCurrentRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 hover:bg-amber-100 text-left text-sm font-bold flex items-center justify-between">
-          <span>🧹 清空目前表單所有欄位</span>
+        <button type="button" onclick="clearCurrentRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 hover:bg-amber-100 text-left text-sm font-bold flex items-center justify-between">
+          <span>清空目前表單所有欄位</span>
           <span class="text-xs">Reset</span>
         </button>
 
-        <button onclick="deleteCurrentRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 text-left text-sm font-bold flex items-center justify-between">
-          <span>🗑️ 刪除此對新人檔案</span>
+        <button type="button" onclick="deleteCurrentRecord(); closeManageModal();" class="w-full py-2.5 px-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 text-left text-sm font-bold flex items-center justify-between">
+          <span>刪除此對新人檔案</span>
           <span class="text-xs">Delete</span>
         </button>
       </div>
 
       <div class="pt-2 flex justify-end">
-        <button onclick="closeManageModal()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 text-white text-xs font-bold">關閉</button>
+        <button type="button" onclick="closeManageModal()" class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-700 text-white text-xs font-bold">關閉</button>
       </div>
     </div>
   </div>
@@ -963,7 +928,6 @@ function doGet(e) {
         options: ['28座', '租車', '兄弟車', '自己車', 'N/A'],
         placeholder: '車型及時間，例如：Model X 租車 0700-1000'
       },
-      // 女家
       brideAttire: {
         label: '11. 出門服裝 (女)',
         mode: 'multi',
@@ -988,7 +952,6 @@ function doGet(e) {
         options: ['爺爺', '嫲嫲', '公公', '婆婆', 'N/A'],
         placeholder: '祖父母備註'
       },
-      // 男家
       groomAttire: {
         label: '11. 出門/入門服裝 (男)',
         mode: 'multi',
@@ -1013,7 +976,6 @@ function doGet(e) {
         options: ['爺爺', '嫲嫲', '公公', '婆婆', 'N/A'],
         placeholder: '祖父母備註'
       },
-      // Crew Meal & 交通
       crewLunch: {
         label: '18A. Crew Meal - Lunch',
         mode: 'single',
@@ -1044,7 +1006,6 @@ function doGet(e) {
         options: ['是', '否'],
         placeholder: '早上的士備註（例如：幾架 / 實報實銷）'
       },
-      // 拍攝環節
       morningSession: {
         label: '20. 早上攝影安排 (Morning Session)',
         mode: 'multi',
@@ -1079,7 +1040,7 @@ function doGet(e) {
     };
 
     // ==========================================
-    // 2. 狀態管理與預設範例資料 (Daisy & Kenny)
+    // 2. 狀態管理與預設範例資料
     // ==========================================
     const STORAGE_KEY = 'hk_wedding_photo_logs_v2';
     const THEME_KEY = 'hk_wedding_photo_theme_v1';
@@ -1141,9 +1102,7 @@ function doGet(e) {
       rec.brideParentsStatus = { selected: ['父母 BOTH'], custom: '' };
       rec.brideParentsRel = 8;
       rec.brideSelfParentsRel = 8;
-      rec.brideSiblingsList = [
-        { role: '姐姐', status: '單身', kids: 0 }
-      ];
+      rec.brideSiblingsList = [{ role: '姐姐', status: '單身', kids: 0 }];
       rec.brideSiblingsNote = '';
       rec.brideGrandparents = { selected: [], custom: '' };
 
@@ -1152,9 +1111,7 @@ function doGet(e) {
       rec.groomParentsStatus = { selected: ['父母 BOTH'], custom: '' };
       rec.groomParentsRel = 8;
       rec.groomSelfParentsRel = 10;
-      rec.groomSiblingsList = [
-        { role: '妹妹', status: '+BF', kids: 0 }
-      ];
+      rec.groomSiblingsList = [{ role: '妹妹', status: '+BF', kids: 0 }];
       rec.groomSiblingsNote = '';
       rec.groomGrandparents = { selected: ['婆婆'], custom: '' };
 
@@ -1195,17 +1152,12 @@ function doGet(e) {
       renderSummarySheet();
     }
 
-    // ==========================================
-    // 3B. 手機折疊與快速跳轉控制
-    // ==========================================
     function toggleSectionBody(bodyId, chevId) {
       const body = document.getElementById(bodyId);
       const chev = document.getElementById(chevId);
       if (!body) return;
       const isHidden = body.classList.toggle('hidden');
-      if (chev) {
-        chev.classList.toggle('rotate-180', !isHidden);
-      }
+      if (chev) chev.classList.toggle('rotate-180', !isHidden);
     }
 
     function jumpToSection(secId) {
@@ -1236,7 +1188,7 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 3C. 姊妹/兄弟人數大按鈕步進器 (方便單手加減)
+    // 3C. 姊妹/兄弟人數大按鈕步進器
     // ==========================================
     function renderPartyStepperComponents() {
       const configs = [
@@ -1341,7 +1293,7 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 4. 動態渲染 Hybrid 混合輸入元件 (含香港酒店快選器)
+    // 4. 動態渲染 Hybrid 混合輸入元件
     // ==========================================
     function buildHotelSelectHtml(key) {
       const optGroups = HK_HOTELS_BY_REGION.map(group => {
@@ -1352,7 +1304,7 @@ function doGet(e) {
       return `
         <div class="mt-2 flex items-center gap-1.5">
           <select id="hotel-picker-${key}" onchange="applyHotelToField('${key}', this)" class="w-full rounded-xl bg-amber-50/90 dark:bg-zinc-800 border border-amber-300/80 dark:border-zinc-600 px-3 py-3 text-sm font-bold text-zinc-800 dark:text-amber-200 focus:outline-none focus:border-pro-accent">
-            <option value="">🏨 快選香港主要酒店 (按九龍 / 港島 / 新界)...</option>
+            <option value="">快選香港主要酒店 (按九龍 / 港島 / 新界)...</option>
             ${optGroups}
           </select>
         </div>
@@ -1368,7 +1320,7 @@ function doGet(e) {
       return `
         <div id="church-picker-wrap-${key}" class="hidden mt-2 flex items-center gap-1.5">
           <select id="church-picker-${key}" onchange="applyChurchToField('${key}', this)" class="w-full rounded-xl bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-300 dark:border-indigo-700 px-3 py-3 text-sm font-bold text-indigo-950 dark:text-indigo-200 focus:outline-none focus:border-pro-accent">
-            <option value="">⛪ 快選香港可證婚教堂 / 禮堂 (按地區)...</option>
+            <option value="">快選香港可證婚教堂 / 禮堂 (按地區)...</option>
             ${optGroups}
           </select>
         </div>
@@ -1412,7 +1364,6 @@ function doGet(e) {
       const rec = getActiveRecord();
       if (!rec[key]) rec[key] = { selected: [], custom: '' };
 
-      // 若有「酒店出門」或「酒店入門」標籤且尚未選取，自動幫忙點亮
       const cfg = HYBRID_FIELDS[key];
       const hotelTag = cfg.options.find(o => o.includes('酒店'));
       if (hotelTag && !rec[key].selected.includes(hotelTag)) {
@@ -1420,7 +1371,6 @@ function doGet(e) {
         updateHybridVisuals(key);
       }
 
-      // 填入或附加至自訂文字框，方便直接打房號或廳名
       const currentCustom = (rec[key].custom || '').trim();
       if (!currentCustom) {
         rec[key].custom = hotelName + ' ';
@@ -1517,7 +1467,6 @@ function doGet(e) {
         }
       });
 
-      // 若該欄位具備教堂快選器，僅在點選「教堂」時顯示教堂清單
       const churchWrap = document.getElementById(`church-picker-wrap-${key}`);
       if (churchWrap) {
         if (selected.includes('教堂')) {
@@ -1529,7 +1478,7 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 4B. 精簡版父母關係 10 分制輸入 (手機大按鈕步進 + 快捷分數)
+    // 4B. 精簡版父母關係 10 分制輸入
     // ==========================================
     function renderRatingComponents() {
       Object.entries(RATING_FIELDS).forEach(([key, label]) => {
@@ -1623,7 +1572,7 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 4C. 親生兄弟姊妹多項組合快選器 (SIBLINGS BUILDER)
+    // 4C. 親生兄弟姊妹多項組合快選器
     // ==========================================
     const SIBLING_ROLES = ['哥哥', '弟弟', '姐姐', '妹妹'];
     const SIBLING_STATUSES = ['單身', '+BF', '+GF', '已婚'];
@@ -1649,10 +1598,8 @@ function doGet(e) {
               </button>
             </div>
 
-            <!-- 已新增的兄弟姊妹列表 -->
             <div id="siblings-rows-${side}" class="space-y-2"></div>
 
-            <!-- 快速新增按鈕列 -->
             <div class="grid grid-cols-4 gap-1.5 pt-0.5">
               ${SIBLING_ROLES.map(role => `
                 <button type="button" onclick="addSiblingRow('${side}', '${role}')"
@@ -1662,7 +1609,6 @@ function doGet(e) {
               `).join('')}
             </div>
 
-            <!-- 額外自由補充輸入 -->
             <input type="text" id="siblings-note-${side}"
               oninput="updateSiblingsNote('${side}', this.value)"
               placeholder="自由補充（例如：細妹帶埋BB、家姐做證婚人）"
@@ -1689,7 +1635,7 @@ function doGet(e) {
         const isOnly = (rec[noteKey] || '').includes('獨生');
         rowsContainer.innerHTML = `
           <div class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 bg-white/60 dark:bg-zinc-900/50 rounded-lg px-2.5 py-2 border border-dashed border-zinc-300 dark:border-zinc-700">
-            ${isOnly ? '✅ 已標記為獨生子女（如需新增可按下方按鈕）' : '尚未新增兄弟姊妹，請按下方「＋ 哥哥 / 弟弟 / 姐姐 / 妹妹」快速加入'}
+            ${isOnly ? '已標記為獨生子女（如需新增可按下方按鈕）' : '尚未新增兄弟姊妹，請按下方「＋ 哥哥 / 弟弟 / 姐姐 / 妹妹」快速加入'}
           </div>
         `;
         return;
@@ -1698,7 +1644,6 @@ function doGet(e) {
       rowsContainer.innerHTML = rec[listKey].map((item, idx) => `
         <div class="bg-white dark:bg-zinc-900 rounded-xl p-3 border border-zinc-200 dark:border-zinc-700 shadow-2xs space-y-2.5">
           <div class="flex items-center justify-between gap-1.5">
-            <!-- 稱謂選擇 -->
             <div class="flex items-center gap-1 flex-wrap">
               <span class="text-xs font-black text-zinc-400 mr-0.5">#${idx + 1}</span>
               ${SIBLING_ROLES.map(r => `
@@ -1709,14 +1654,12 @@ function doGet(e) {
               `).join('')}
             </div>
 
-            <!-- 刪除該位 -->
             <button type="button" onclick="removeSiblingRow('${side}', ${idx})" title="移除此位"
               class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-black text-sm flex items-center justify-center hover:bg-rose-100 shrink-0">
               ✕
             </button>
           </div>
 
-          <!-- 感情狀況 & 小朋友數量 -->
           <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
             <div class="grid grid-cols-4 gap-1.5">
               ${SIBLING_STATUSES.map(st => `
@@ -1808,7 +1751,6 @@ function doGet(e) {
       if (formattedList.length > 0) parts.push(formattedList.join('、'));
       if (note) parts.push(note);
 
-      // 兼容舊版儲存格式
       const legacyKey = side === 'bride' ? 'brideSiblings' : 'groomSiblings';
       if (parts.length === 0 && rec[legacyKey]) {
         return formatHybrid(rec[legacyKey], '-');
@@ -1877,7 +1819,7 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 6. 速查卡渲染與格式化工具
+    // 6. 速查卡渲染 (無 Emoji、A5 完整資料、手機單欄易讀)
     // ==========================================
     function formatHybrid(obj, fallback = '-') {
       if (!obj) return fallback;
@@ -1906,7 +1848,6 @@ function doGet(e) {
 
       const weekday = getWeekdayZh(rec.weddingDate);
       const pkgText = formatHybrid(rec.package, '未定方案');
-      // 兼容舊資料若只有 auspiciousTime
       const legacyTime = rec.auspiciousTime ? formatHybrid(rec.auspiciousTime, '') : '';
       const leaveTimeText = formatHybrid(rec.auspiciousLeaveTime, legacyTime || '無吉時');
       const enterTimeText = formatHybrid(rec.auspiciousEnterTime, '無吉時');
@@ -1915,7 +1856,6 @@ function doGet(e) {
       const parkingText = formatHybrid(rec.parking, '未定');
       const isNoParking = parkingText.includes('冇車位') || parkingText.includes('自費');
 
-      // 檢查低分家庭關係警告 (已移除冇車位頂部警示)
       const warnings = [];
       if (rec.brideParentsRel <= 5) warnings.push(`女家父母關係 ${rec.brideParentsRel}/10`);
       if (rec.brideSelfParentsRel <= 5) warnings.push(`新娘與父母 ${rec.brideSelfParentsRel}/10`);
@@ -1935,7 +1875,6 @@ function doGet(e) {
         </div>
       ` : '';
 
-      // 拍攝環節彙整
       const morningItems = [
         ...(rec.morningSession?.selected || []),
         ...(rec.morningSession?.custom ? [rec.morningSession.custom] : [])
@@ -1978,7 +1917,7 @@ function doGet(e) {
       };
 
       const html = `
-        <!-- 1. 頂部標題欄 (荒山映像放大字體、右上角標註製作日期及時間) -->
+        <!-- 1. 頂部標題欄 -->
         <div class="bg-zinc-900 text-white p-4">
           <div class="flex items-baseline justify-between gap-2 pb-2.5 mb-2.5 border-b border-zinc-800">
             <div class="text-xl sm:text-2xl tracking-wider text-orange-400 font-black">荒山映像</div>
@@ -2011,7 +1950,7 @@ function doGet(e) {
             </div>
           </div>
 
-          <!-- 膳食與車位速覽條 (手機易讀大字) -->
+          <!-- 膳食與車位速覽條 -->
           <div class="mt-3.5 pt-3 border-t border-zinc-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs sm:text-sm">
             <div class="bg-zinc-800/90 rounded-xl px-2.5 py-2">
               <span class="text-zinc-400 block text-[10px] font-bold">LUNCH</span>
@@ -2036,7 +1975,7 @@ function doGet(e) {
 
         <div class="p-3.5 sm:p-4 space-y-4 text-sm">
 
-          <!-- 2. 地點與時間軸卡片 (手機單欄全寬大字 + 一鍵複製地址) -->
+          <!-- 2. 地點與時間軸卡片 -->
           <div class="grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-3">
             <div class="rounded-2xl bg-rose-50/80 dark:bg-rose-950/25 border border-rose-200 dark:border-rose-900/50 p-3.5">
               <div class="flex items-center justify-between gap-2 mb-1">
@@ -2071,7 +2010,7 @@ function doGet(e) {
             </div>
           </div>
 
-          <!-- 花車與交通 (手機直向清晰分行) -->
+          <!-- 花車與交通 -->
           <div class="rounded-2xl bg-zinc-100/90 dark:bg-zinc-800/90 p-3.5 space-y-2 text-sm">
             <div class="flex items-start gap-2">
               <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">花車：</span>
@@ -2089,7 +2028,7 @@ function doGet(e) {
             </div>
           </div>
 
-          <!-- 3. 團隊與合作單位速查列 (手機 2 欄大字網格) -->
+          <!-- 3. 團隊與合作單位速查列 -->
           <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-3.5">
             <div class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase mb-2.5">團隊與單位速查 (Vendors & Crew)</div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-sm">
@@ -2124,7 +2063,7 @@ function doGet(e) {
             </div>
           </div>
 
-          <!-- 4. 雙方家庭與服裝對照表 (手機改為上下全寬大字卡片，徹底告別雙欄擠迫) -->
+          <!-- 4. 雙方家庭與服裝對照表 -->
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase">雙方家庭與敬茶細節</span>
@@ -2136,7 +2075,6 @@ function doGet(e) {
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-3">
-              <!-- 女家欄 -->
               <div id="sum-card-bride" class="rounded-2xl border-2 border-rose-200 dark:border-rose-900/60 overflow-hidden">
                 <div class="bg-rose-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
                   <span>女家 (BRIDE)</span>
@@ -2154,7 +2092,6 @@ function doGet(e) {
                 </div>
               </div>
 
-              <!-- 男家欄 -->
               <div id="sum-card-groom" class="rounded-2xl border-2 border-sky-200 dark:border-sky-900/60 overflow-hidden">
                 <div class="bg-sky-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
                   <span>男家 (GROOM)</span>
@@ -2174,14 +2111,7 @@ function doGet(e) {
             </div>
           </div>
 
-          ${rec.familyRemark && rec.familyRemark.trim() ? `
-            <div class="rounded-2xl bg-amber-50 dark:bg-amber-950/35 border border-amber-300 dark:border-amber-800 p-3.5 text-sm">
-              <span class="font-extrabold text-amber-800 dark:text-amber-300 block mb-0.5">家庭特別備註：</span>
-              <span class="font-bold text-zinc-900 dark:text-white">${escapeHtml(rec.familyRemark)}</span>
-            </div>
-          ` : ''}
-
-          <!-- 5. 拍攝環節 Checklist (大標籤易讀設計) -->
+          <!-- 5. 拍攝環節 Checklist -->
           <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-3.5 space-y-3">
             <div class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase">拍攝環節 Checklist</div>
 
@@ -2348,7 +2278,7 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 7B. 試算表紀錄整合與複製 (SPREADSHEET EXPORT)
+    // 7. Google 試算表雙向寫入及 JSONP 讀取
     // ==========================================
     function getSpreadsheetColumns(rec) {
       const legacyTime = rec.auspiciousTime ? formatHybrid(rec.auspiciousTime, '') : '';
@@ -2444,7 +2374,6 @@ function doGet(e) {
       const tsvBox = document.getElementById('spreadsheet-tsv-box');
       if (tsvBox) tsvBox.value = tsvRow;
 
-      // 載入已儲存的 Google Apps Script 網址
       const urlInput = document.getElementById('gas-webhook-url');
       if (urlInput && !urlInput.value) {
         urlInput.value = localStorage.getItem(GAS_URL_KEY) || '';
@@ -2487,7 +2416,7 @@ function doGet(e) {
         showToast('請先貼上有效的 Google Apps Script 網址');
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
-          statusEl.textContent = '⚠️ 尚未輸入 Google Apps Script 網址，請按右上角「設定教學 / 程式碼」取得網址。';
+          statusEl.textContent = '尚未輸入 Google Apps Script 網址，請按右上角「設定教學 / 程式碼」取得網址。';
         }
         return;
       }
@@ -2506,7 +2435,7 @@ function doGet(e) {
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<span>⏳ 正在傳送至 Google 試算表...</span>';
+        btn.innerHTML = '<span>正在傳送至 Google 試算表...</span>';
       }
       if (statusEl) {
         statusEl.className = 'text-xs font-bold text-amber-600 dark:text-amber-400';
@@ -2514,7 +2443,6 @@ function doGet(e) {
       }
 
       try {
-        // 使用 no-cors + text/plain 避開 Google Apps Script 跨網域預檢限制
         await fetch(url, {
           method: 'POST',
           mode: 'no-cors',
@@ -2527,25 +2455,24 @@ function doGet(e) {
         const nowStr = formatDateTimeZh(Date.now());
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-emerald-600 dark:text-emerald-400';
-          statusEl.textContent = `✅ 已成功輸出至 Google 試算表！（同步時間：${nowStr}）`;
+          statusEl.textContent = `已成功輸出至 Google 試算表！（同步時間：${nowStr}）`;
         }
         showToast('已成功同步至 Google 試算表！');
       } catch (err) {
         console.error('Sync error:', err);
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
-          statusEl.textContent = '❌ 同步失敗，請檢查網絡連線或確認 Apps Script 部署權限已設為「所有人」。';
+          statusEl.textContent = '同步失敗，請檢查網絡連線或確認 Apps Script 部署權限已設為「所有人」。';
         }
         showToast('同步失敗，請檢查網址或網絡');
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<span>☁️ 輸出並儲存至 Google 試算表</span>';
+          btn.innerHTML = '<span>輸出並儲存至 Google 試算表</span>';
         }
       }
     }
 
-    // 從橫向儲存格反推還原為紀錄物件（兼容手動在 Google Sheets 填寫或舊版資料）
     function buildRecordFromSheetRow(item) {
       if (item.rawJson) {
         try {
@@ -2609,6 +2536,45 @@ function doGet(e) {
         '男家家庭關係': 'groomParentsStatus',
         '男家祖父母': 'groomGrandparents',
         'Crew Lunch': 'crewLunch',
+        'Crew Dinner': 'crewDinner',
+        '團隊交通': 'transport',
+        '泊車車位': 'parking',
+        '早上的士': 'morningTaxi',
+        '早上攝影環節': 'morningSession',
+        '證婚進場': 'ceremonyMarchIn',
+        '證婚儀式': 'ceremonyRituals',
+        '午宴或晚宴環節': 'banquetHighlights'
+      };
+
+      Object.entries(headerToHybridKey).forEach(([colHeader, fieldKey]) => {
+        const rawVal = map[colHeader];
+        if (!rawVal) return;
+        const cfg = HYBRID_FIELDS[fieldKey];
+        const parts = rawVal.split('|').map(s => s.trim()).filter(Boolean);
+        const matchedOpts = [];
+        const customParts = [];
+
+        parts.forEach(part => {
+          const subItems = part.split('、').map(s => s.trim()).filter(Boolean);
+          const allArePreset = subItems.length > 0 && subItems.every(si => cfg.options.includes(si));
+          if (allArePreset) {
+            subItems.forEach(si => {
+              if (!matchedOpts.includes(si)) matchedOpts.push(si);
+            });
+          } else {
+            customParts.push(part);
+          }
+        });
+
+        rec[fieldKey] = {
+          selected: matchedOpts,
+          custom: customParts.join(' | ')
+        };
+      });
+
+      return rec;
+    }
+
     function fetchJsonpFromGas(url) {
       return new Promise((resolve, reject) => {
         const cbName = '__gas_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
@@ -2625,7 +2591,7 @@ function doGet(e) {
           if (settled) return;
           settled = true;
           cleanup();
-          reject(new Error('連線逾時，請確認 Apps Script 已更新為支援 callback 的新版程式碼並部署「新版本」。'));
+          reject(new Error('連線逾時，請確認 Apps Script 已貼上支援 callback 的新版程式碼並部署為「新版本」。'));
         }, 12000);
 
         window[cbName] = (data) => {
@@ -2660,7 +2626,7 @@ function doGet(e) {
         showToast('請先在「3. 試算表匯出」貼上 Google Apps Script 網址');
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
-          statusEl.textContent = '⚠️ 請先貼上 Google Apps Script 網址（並確認已加入新版 doGet 讀取功能並部署新版本）。';
+          statusEl.textContent = '請先貼上 Google Apps Script 網址（並確認已更新新版 doGet 並部署新版本）。';
         }
         return;
       }
@@ -2668,7 +2634,7 @@ function doGet(e) {
       saveGasUrl(url);
       if (loadBtn) {
         loadBtn.disabled = true;
-        loadBtn.innerHTML = '<span>⏳ 正在從試算表讀取...</span>';
+        loadBtn.innerHTML = '<span>正在從試算表讀取...</span>';
       }
       if (statusEl) {
         statusEl.className = 'text-xs font-bold text-sky-600 dark:text-sky-400';
@@ -2686,7 +2652,7 @@ function doGet(e) {
         if (data.records.length === 0) {
           if (statusEl) {
             statusEl.className = 'text-xs font-bold text-amber-600 dark:text-amber-400';
-            statusEl.textContent = 'ℹ️ Google 試算表目前尚無任何新人紀錄。';
+            statusEl.textContent = 'Google 試算表目前尚無任何新人紀錄。';
           }
           showToast('試算表目前沒有資料');
           return;
@@ -2694,7 +2660,6 @@ function doGet(e) {
 
         const importedRecords = data.records.map(buildRecordFromSheetRow);
 
-        // 依 recordId 合併更新本機新人檔案清單（保留未上傳的本機檔案）
         importedRecords.forEach(imp => {
           const existingIdx = appState.records.findIndex(r => r.id === imp.id);
           if (existingIdx >= 0) {
@@ -2704,7 +2669,6 @@ function doGet(e) {
           }
         });
 
-        // 自動切換至最新讀取到的第一筆新人檔案
         appState.activeId = importedRecords[0].id;
         saveToStorage();
         populateFormFromRecord(getActiveRecord());
@@ -2714,20 +2678,20 @@ function doGet(e) {
         const nowStr = formatDateTimeZh(Date.now());
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-emerald-600 dark:text-emerald-400';
-          statusEl.textContent = `✅ 已成功從 Google 試算表讀取 ${importedRecords.length} 份新人檔案！（讀取時間：${nowStr}）`;
+          statusEl.textContent = `已成功從 Google 試算表讀取 ${importedRecords.length} 份新人檔案！（讀取時間：${nowStr}）`;
         }
         showToast(`已成功載入 ${importedRecords.length} 份新人檔案！`);
       } catch (err) {
         console.error('Load from Google Sheets error:', err);
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
-          statusEl.textContent = `❌ ${err.message || '讀取失敗：請按右上角「設定教學 / 程式碼」複製新版 doGet 程式碼，並於「管理部署作業」部署為「新版本」。'}`;
+          statusEl.textContent = `${err.message || '讀取失敗：請按右上角「設定教學 / 程式碼」複製新版程式碼，並於「管理部署作業」部署為「新版本」。'}`;
         }
-        showToast('讀取失敗，請更新 Apps Script 新版本');
+        showToast('讀取失敗，請確認已部署新版本');
       } finally {
         if (loadBtn) {
           loadBtn.disabled = false;
-          loadBtn.innerHTML = '<span>📥 從 Google 試算表讀取全部新人</span>';
+          loadBtn.innerHTML = '<span>從 Google 試算表讀取全部新人</span>';
         }
       }
     }
@@ -2741,7 +2705,7 @@ function doGet(e) {
       const valueLine = cols.map(c => c.value).join('\t');
       const output = includeHeader ? `${headerLine}\n${valueLine}` : valueLine;
 
-      copyQuickText(output, includeHeader ? '標題列及試算表資料（可直接貼上 Excel / Google Sheets）' : '試算表單行資料（可直接貼上 Excel / Google Sheets）');
+      copyQuickText(output, includeHeader ? '標題列及試算表資料' : '試算表單行資料');
     }
 
     // ==========================================
@@ -2768,6 +2732,9 @@ function doGet(e) {
       clearCurrentRecord();
     }
 
+    // ==========================================
+    // 8. 複製 WhatsApp 純文字版 (無 Emoji)
+    // ==========================================
     function copyWhatsAppText() {
       const rec = getActiveRecord();
       if (!rec) return;
@@ -2861,6 +2828,7 @@ function doGet(e) {
       saveToStorage();
       populateFormFromRecord(getActiveRecord());
       renderSummarySheet();
+      renderSpreadsheetExport();
       showToast('已切換新人紀錄');
     }
 
