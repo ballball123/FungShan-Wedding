@@ -611,19 +611,19 @@ function doGet(e) {
   if (lastRow &lt; 2) {
     payload = JSON.stringify({ status: 'ok', records: [] });
   } else {
-    var data = sheet.getDataRange().getValues();
+    var data = sheet.getDataRange().getDisplayValues();
     var headers = data[0];
     var records = [];
 
     for (var i = 1; i &lt; data.length; i++) {
       var row = data[i];
       if (!row[0] &amp;&amp; !row[2]) continue;
-      var lastCell = row[row.length - 1];
+      var lastCell = String(row[row.length - 1] || '').trim();
       records.push({
         recordId: String(row[0] || ''),
         headers: headers,
         row: row,
-        rawJson: typeof lastCell === 'string' &amp;&amp; lastCell.indexOf('{') === 0 ? lastCell : ''
+        rawJson: lastCell.indexOf('{') === 0 ? lastCell : ''
       });
     }
     payload = JSON.stringify({ status: 'ok', records: records });
@@ -990,143 +990,143 @@ function doGet(e) {
       },
       transport: {
         label: '19A. 團隊交通安排',
-        mode: 'multi',
-        options: ['跟28座', '團隊自駕', 'Uber/的士', '步程可達'],
-        placeholder: '車程路線，例如：天水圍 -> 元朗'
-      },
-      parking: {
-        label: '19B. 泊車車位安排',
-        mode: 'single',
-        options: ['有車位', '冇車位', '酒店代客泊車', '需自費泊附近'],
-        placeholder: '車位數量/備註'
-      },
-      morningTaxi: {
-        label: '19C. 早上的士',
-        mode: 'single',
-        options: ['是', '否'],
-        placeholder: '早上的士備註（例如：幾架 / 實報實銷）'
-      },
-      morningSession: {
-        label: '20. 早上攝影安排 (Morning Session)',
-        mode: 'multi',
-        options: ['Bridal Shower', 'Girls Talk', 'Parents Talk', '紙碎', 'N/A'],
-        placeholder: '其他早上環節'
-      },
-      ceremonyMarchIn: {
-        label: '21A. 證婚進場方式 (March in)',
-        mode: 'multi',
-        options: ['爸爸帶進場', '媽媽帶進場', '父母雙親帶進場', '一對新人進場', '花仔花女', '戒童/寵物'],
-        placeholder: '自訂進場方式'
-      },
-      ceremonyRituals: {
-        label: '21B. 證婚儀式環節 (Ceremony Rituals)',
-        mode: 'multi',
-        options: ['March out', 'Remarch in', '拋花瓣', '泡泡', '紙碎', '拋花球', '大合照', 'TBC'],
-        placeholder: '其他證婚環節'
-      },
-      banquetHighlights: {
-        label: '22. 午宴或晚宴特別環節 (Banquet Highlights)',
-        mode: 'multi',
-        options: ['切蛋糕 CAKE', '致辭 SPEECH', '送花給父母', '敬酒 Toasting', '播成長片段', '播早拍晚播 SDE', '玩遊戲', 'Live Band'],
-        placeholder: '其他午宴或晚宴環節'
+    function normalizeSheetDate(rawDate) {
+      if (!rawDate) return '';
+      const s = String(rawDate).trim();
+      // 若已是 YYYY-MM-DD 或 YYYY/MM/DD 格式，直接標準化
+      const m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+      if (m) {
+        return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
       }
-    };
-
-    const RATING_FIELDS = {
-      brideParentsRel: '14A. 父母之間關係',
-      brideSelfParentsRel: '14B. 新娘與父母關係',
-      groomParentsRel: '14A. 父母之間關係',
-      groomSelfParentsRel: '14B. 新郎與父母關係'
-    };
-
-    // ==========================================
-    // 2. 狀態管理與預設範例資料
-    // ==========================================
-    const STORAGE_KEY = 'hk_wedding_photo_logs_v2';
-    const THEME_KEY = 'hk_wedding_photo_theme_v1';
-    const GAS_URL_KEY = 'hk_wedding_photo_gas_url_v1';
-
-    function getEmptyRecord(id) {
-      const record = {
-        id: id || 'rec_' + Date.now(),
-        updatedAt: Date.now(),
-        coupleName: '',
-        weddingDate: '',
-        mua: '',
-        familyRemark: '',
-        generalNotes: '',
-        brideParentsRel: 8,
-        brideSelfParentsRel: 8,
-        groomParentsRel: 8,
-        groomSelfParentsRel: 8,
-        brideSiblingsList: [],
-        brideSiblingsNote: '',
-        groomSiblingsList: [],
-        groomSiblingsNote: ''
-      };
-      Object.keys(HYBRID_FIELDS).forEach(key => {
-        record[key] = { selected: [], custom: '' };
-      });
-      return record;
+      // 若為 ISO 時區字串 (例如 2027-01-02T16:00:00.000Z)，轉為香港本地日期 (UTC+8)
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        const hkTime = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+        const yyyy = hkTime.getUTCFullYear();
+        const mm = String(hkTime.getUTCMonth() + 1).padStart(2, '0');
+        const dd = String(hkTime.getUTCDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      return '';
     }
 
-    function getDaisyKennySample(id) {
-      const rec = getEmptyRecord(id || 'rec_sample_daisy_kenny');
-      rec.coupleName = 'Daisy & Kenny';
-      rec.weddingDate = '2026-11-29';
-      rec.package = { selected: ['Haft 2P1V'], custom: '' };
-      rec.auspiciousLeaveTime = { selected: ['0700-0900'], custom: '' };
-      rec.auspiciousEnterTime = { selected: ['0800-1000'], custom: '' };
-      rec.brideLocation = {
-        selected: ['女家住宅'],
-        custom: '天水圍 Room A, 6/F, Block 8, 朗晴居 Grand Del Sol'
-      };
-      rec.groomLocation = {
-        selected: ['男家住宅'],
-        custom: '元朗 天盛苑 Room 3505, Block E, Tin Shing Court, Tin Shui Wai, N.T.'
-      };
-      rec.ceremonyVenue = { selected: ['已註冊'], custom: '香港逸東酒店 (Eaton HK)' };
-      rec.banquetVenue = { selected: [], custom: '香港逸東酒店 (Eaton HK) 10-12圍' };
-      rec.bridesmaidsCount = { selected: ['4'], custom: '' };
-      rec.groomsmenCount = { selected: ['4'], custom: '' };
-      rec.videoTeam = { selected: ['1V'], custom: '' };
-      rec.mc = { selected: ['兄弟'], custom: '' };
-      rec.daiKam = { selected: ['N/A'], custom: '' };
-      rec.mua = 'Amy Ng';
-      rec.celebrant = { selected: ['N/A'], custom: '' };
-      rec.deco = { selected: [], custom: '' };
-      rec.weddingCar = { selected: ['租車'], custom: 'Model X 租車 0700-1000' };
+    function buildRecordFromSheetRow(item) {
+      const headers = item.headers || [];
+      const row = item.row || [];
+      const map = {};
+      headers.forEach((h, idx) => {
+        const key = String(h).trim();
+        if (key) {
+          map[key] = row[idx] !== undefined && row[idx] !== null ? String(row[idx]).trim() : '';
+        }
+      });
 
-      rec.brideAttire = { selected: ['裙褂'], custom: '' };
-      rec.brideTeaSets = { selected: ['2組'], custom: '' };
-      rec.brideParentsStatus = { selected: ['父母 BOTH'], custom: '' };
-      rec.brideParentsRel = 8;
-      rec.brideSelfParentsRel = 8;
-      rec.brideSiblingsList = [{ role: '姐姐', status: '單身', kids: 0 }];
-      rec.brideSiblingsNote = '';
-      rec.brideGrandparents = { selected: [], custom: '' };
+      const hasValidHeaders = headers.some(h => String(h).trim() === '新人名字');
+      let rec = getEmptyRecord(item.recordId || 'rec_sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
 
-      rec.groomAttire = { selected: ['西裝'], custom: '' };
-      rec.groomTeaSets = { selected: ['2組'], custom: '' };
-      rec.groomParentsStatus = { selected: ['父母 BOTH'], custom: '' };
-      rec.groomParentsRel = 8;
-      rec.groomSelfParentsRel = 10;
-      rec.groomSiblingsList = [{ role: '妹妹', status: '+BF', kids: 0 }];
-      rec.groomSiblingsNote = '';
-      rec.groomGrandparents = { selected: ['婆婆'], custom: '' };
+      // 若有 _原始資料JSON 且無最新手動修改衝突，先載入完整 JSON
+      if (item.rawJson) {
+        try {
+          const parsed = JSON.parse(item.rawJson);
+          if (parsed && typeof parsed === 'object') {
+            rec = Object.assign(rec, parsed);
+          }
+        } catch (e) {
+          console.warn('rawJson parse fallback:', e);
+        }
+      }
 
-      rec.familyRemark = '';
-      rec.crewLunch = { selected: ['外賣/飯盒'], custom: '' };
-      rec.crewDinner = { selected: [], custom: '' };
-      rec.transport = { selected: ['跟28座'], custom: '車程：天水圍 -> 元朗' };
-      rec.parking = { selected: ['冇車位'], custom: '' };
-      rec.morningTaxi = { selected: ['否'], custom: '' };
+      // 若無 rawJson（舊版試算表紀錄），則嚴格依照試算表每一欄標題逐一還原，確保空白欄位不會誤填
+      if (!item.rawJson && hasValidHeaders) {
+        rec.coupleName = map['新人名字'] || '';
+        rec.weddingDate = normalizeSheetDate(map['婚禮日期']);
+        rec.mua = map['化妝師MUA'] || '';
+        rec.familyRemark = map['家庭特別備註'] || '';
+        rec.generalNotes = map['全日特別備註'] || '';
 
-      rec.morningSession = { selected: ['Girls Talk', 'Parents Talk'], custom: '' };
-      rec.ceremonyMarchIn = { selected: [], custom: '' };
-      rec.ceremonyRituals = { selected: ['拋花瓣'], custom: '' };
-      rec.banquetHighlights = { selected: ['切蛋糕 CAKE', '致辭 SPEECH', '送花給父母'], custom: '' };
-      rec.generalNotes = '';
+        const parseScore = (str, defVal) => {
+          const m = String(str || '').match(/(\d+)/);
+          return m ? Math.min(10, Math.max(0, parseInt(m[1], 10))) : defVal;
+        };
+        rec.brideParentsRel = parseScore(map['女家父母間評分'], 8);
+        rec.brideSelfParentsRel = parseScore(map['新娘與父母評分'], 8);
+        rec.groomParentsRel = parseScore(map['男家父母間評分'], 8);
+        rec.groomSelfParentsRel = parseScore(map['新郎與父母評分'], 8);
+
+        rec.brideSiblingsList = [];
+        rec.groomSiblingsList = [];
+        rec.brideSiblingsNote = map['女家兄弟姊妹'] || '';
+        rec.groomSiblingsNote = map['男家兄弟姊妹'] || '';
+
+        const headerToHybridKey = {
+          '服務方案': 'package',
+          '出門吉時': 'auspiciousLeaveTime',
+          '入門吉時': 'auspiciousEnterTime',
+          '出門地點(女家)': 'brideLocation',
+          '入門地點(男家)': 'groomLocation',
+          '證婚場地': 'ceremonyVenue',
+          '宴會場地及圍數': 'banquetVenue',
+          '姊妹人數': 'bridesmaidsCount',
+          '兄弟人數': 'groomsmenCount',
+          'Video Team': 'videoTeam',
+          'MC司儀': 'mc',
+          '大妗姐': 'daiKam',
+          '律師': 'celebrant',
+          'DECO': 'deco',
+          '花車': 'weddingCar',
+          '女家出門服裝': 'brideAttire',
+          '女家敬茶組合': 'brideTeaSets',
+          '女家家庭關係': 'brideParentsStatus',
+          '女家祖父母': 'brideGrandparents',
+          '男家出門服裝': 'groomAttire',
+          '男家敬茶組合': 'groomTeaSets',
+          '男家家庭關係': 'groomParentsStatus',
+          '男家祖父母': 'groomGrandparents',
+          'Crew Lunch': 'crewLunch',
+          'Crew Dinner': 'crewDinner',
+          '團隊交通': 'transport',
+          '泊車車位': 'parking',
+          '早上的士': 'morningTaxi',
+          '早上攝影環節': 'morningSession',
+          '證婚進場': 'ceremonyMarchIn',
+          '證婚儀式': 'ceremonyRituals',
+          '午宴或晚宴環節': 'banquetHighlights'
+        };
+
+        Object.entries(headerToHybridKey).forEach(([colHeader, fieldKey]) => {
+          const rawVal = map[colHeader] || '';
+          const cfg = HYBRID_FIELDS[fieldKey];
+          if (!rawVal) {
+            rec[fieldKey] = { selected: [], custom: '' };
+            return;
+          }
+
+          const parts = rawVal.split('|').map(s => s.trim()).filter(Boolean);
+          const matchedOpts = [];
+          const customParts = [];
+
+          parts.forEach(part => {
+            const subItems = part.split('、').map(s => s.trim()).filter(Boolean);
+            const allArePreset = subItems.length > 0 && subItems.every(si => cfg.options.includes(si));
+            if (allArePreset) {
+              subItems.forEach(si => {
+                if (!matchedOpts.includes(si)) matchedOpts.push(si);
+              });
+            } else {
+              customParts.push(part);
+            }
+          });
+
+          rec[fieldKey] = {
+            selected: matchedOpts,
+            custom: customParts.join(' | ')
+          };
+        });
+      }
+
+      if (rec.weddingDate) {
+        rec.weddingDate = normalizeSheetDate(rec.weddingDate);
+      }
       return rec;
     }
 
