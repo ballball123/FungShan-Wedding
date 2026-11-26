@@ -990,6 +990,131 @@ function doGet(e) {
       },
       transport: {
         label: '19A. 團隊交通安排',
+        mode: 'multi',
+        options: ['跟花車/28座', '自己車', '坐的士/Uber', '地鐵/公共交通'],
+        placeholder: '補充交通細節（例如：早上分兩架的士由女家去男家）'
+      },
+      parking: {
+        label: '19B. 泊車車位安排',
+        mode: 'single',
+        options: ['場地提供免費車位', '有車位(自費)', '冇車位/附近時租'],
+        placeholder: '車位數量或停車場備註'
+      },
+      morningTaxi: {
+        label: '19C. 早上的士 (是 / 否)',
+        mode: 'single',
+        options: ['是', '否'],
+        placeholder: '早上的士備註（例如：女家去男家 1 架）'
+      },
+      morningSession: {
+        label: '20. 早上攝影環節',
+        mode: 'multi',
+        options: ['化妝花絮', '婚紗/褂細節', '玩新郎/開門利是', '讀愛的宣言', '女家敬茶', '出門大合照', '男家入門敬茶', '外影(酒店/公園)'],
+        placeholder: '其他早上環節備註'
+      },
+      ceremonyMarchIn: {
+        label: '21A. 證婚進場方式',
+        mode: 'multi',
+        options: ['新郎單獨進場', '新娘由爸爸帶領進場', '新人一齊進場', '花仔花女進場', '無進場儀式'],
+        placeholder: '進場細節備註'
+      },
+      ceremonyRituals: {
+        label: '21B. 證婚儀式環節',
+        mode: 'multi',
+        options: ['讀誓詞', '交換戒指', '揭頭紗/Kiss', '簽結婚證書', '全場大合照', '拋花球'],
+        placeholder: '證婚細節備註'
+      },
+      banquetHighlights: {
+        label: '22. 午宴或晚宴環節',
+        mode: 'multi',
+        options: ['迎賓影相', '成長片段', '早拍晚播 (SDE)', 'March-in 進場', '切蛋糕/合巹交杯', '台上祝酒', '台下敬酒', '遊戲環節', '送客合照'],
+        placeholder: '宴會流程特別備註'
+      }
+    };
+
+    const RATING_FIELDS = {
+      brideParentsRel: '14A. 女家父母之間關係',
+      brideSelfParentsRel: '14B. 新娘與父母關係',
+      groomParentsRel: '14C. 男家父母之間關係',
+      groomSelfParentsRel: '14D. 新郎與父母關係'
+    };
+
+    const STORAGE_KEY = 'wildmountain_wedding_records_v1';
+    const THEME_KEY = 'wildmountain_wedding_theme_v1';
+    const GAS_URL_KEY = 'wildmountain_gas_webhook_url_v1';
+
+    function getEmptyRecord(customId) {
+      const rec = {
+        id: customId || 'rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        updatedAt: Date.now(),
+        coupleName: '',
+        weddingDate: '',
+        mua: '',
+        brideParentsRel: 8,
+        brideSelfParentsRel: 8,
+        groomParentsRel: 8,
+        groomSelfParentsRel: 8,
+        brideSiblingsList: [],
+        brideSiblingsNote: '',
+        groomSiblingsList: [],
+        groomSiblingsNote: '',
+        familyRemark: '',
+        generalNotes: ''
+      };
+      Object.keys(HYBRID_FIELDS).forEach(k => {
+        rec[k] = { selected: [], custom: '' };
+      });
+      return rec;
+    }
+
+    function getDaisyKennySample(customId) {
+      const rec = getEmptyRecord(customId || 'rec_sample_daisy_kenny');
+      rec.coupleName = 'Daisy & Kenny';
+      rec.weddingDate = '2026-11-29';
+      rec.package = { selected: ['Haft 2P1V'], custom: '' };
+      rec.auspiciousLeaveTime = { selected: ['0700-0900'], custom: '' };
+      rec.auspiciousEnterTime = { selected: ['0800-1000'], custom: '' };
+      rec.brideLocation = { selected: ['女家住宅'], custom: '天水圍嘉湖山莊賞湖居' };
+      rec.groomLocation = { selected: ['男家住宅'], custom: '元朗朗屏8號' };
+      rec.ceremonyVenue = { selected: ['已註冊'], custom: '香港逸東酒店 (Eaton HK) 17:30 證婚' };
+      rec.banquetVenue = { selected: ['晚宴'], custom: '香港逸東酒店 (Eaton HK) 18圍' };
+      rec.bridesmaidsCount = { selected: ['4'], custom: '' };
+      rec.groomsmenCount = { selected: ['4'], custom: '' };
+      rec.videoTeam = { selected: ['1V'], custom: '' };
+      rec.mc = { selected: ['兄弟'], custom: '' };
+      rec.daiKam = { selected: ['N/A'], custom: '' };
+      rec.mua = 'Amy Makeup';
+      rec.celebrant = { selected: ['現場律師'], custom: '17:30' };
+      rec.deco = { selected: ['有DECO'], custom: '' };
+      rec.weddingCar = { selected: ['28座', '兄弟車'], custom: '28座接載兄弟姊妹' };
+      rec.brideAttire = { selected: ['裙褂'], custom: '' };
+      rec.brideTeaSets = { selected: ['3組'], custom: '父母、婆婆、舅父' };
+      rec.brideParentsStatus = { selected: ['父母 BOTH'], custom: '' };
+      rec.brideParentsRel = 9;
+      rec.brideSelfParentsRel = 9;
+      rec.brideSiblingsList = [{ role: '妹妹', status: '單身', kids: 0 }];
+      rec.brideGrandparents = { selected: ['婆婆'], custom: '' };
+      rec.groomAttire = { selected: ['西裝'], custom: '' };
+      rec.groomTeaSets = { selected: ['2組'], custom: '父母、嫲嫲' };
+      rec.groomParentsStatus = { selected: ['父母 BOTH'], custom: '' };
+      rec.groomParentsRel = 8;
+      rec.groomSelfParentsRel = 9;
+      rec.groomSiblingsList = [{ role: '哥哥', status: '已婚', kids: 1 }];
+      rec.groomGrandparents = { selected: ['嫲嫲'], custom: '' };
+      rec.crewLunch = { selected: ['外賣/飯盒'], custom: '' };
+      rec.crewDinner = { selected: ['酒店/酒樓安排'], custom: '酒店提供員工餐' };
+      rec.transport = { selected: ['跟花車/28座'], custom: '' };
+      rec.parking = { selected: ['場地提供免費車位'], custom: '2個免費車位' };
+      rec.morningTaxi = { selected: ['是'], custom: '' };
+      rec.morningSession = { selected: ['化妝花絮', '玩新郎/開門利是', '讀愛的宣言', '女家敬茶', '出門大合照', '男家入門敬茶'], custom: '' };
+      rec.ceremonyMarchIn = { selected: ['新娘由爸爸帶領進場'], custom: '' };
+      rec.ceremonyRituals = { selected: ['讀誓詞', '交換戒指', '揭頭紗/Kiss', '簽結婚證書', '全場大合照'], custom: '' };
+      rec.banquetHighlights = { selected: ['迎賓影相', '成長片段', '早拍晚播 (SDE)', 'March-in 進場', '切蛋糕/合巹交杯', '台上祝酒', '台下敬酒', '送客合照'], custom: '' };
+      rec.familyRemark = '女家婆婆坐輪椅，敬茶時安排坐梳化中間';
+      rec.generalNotes = '17:00 酒店平台影外影合照；晚宴全晚不玩遊戲';
+      return rec;
+    }
+
     function normalizeSheetDate(rawDate) {
       if (!rawDate) return '';
       const s = String(rawDate).trim();
