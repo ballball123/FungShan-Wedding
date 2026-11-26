@@ -156,12 +156,16 @@
 
     <div class="max-w-3xl mx-auto px-3 py-2 flex items-center justify-between gap-2">
       <!-- 新人切換器 -->
-      <div class="flex items-center gap-2 min-w-0 flex-1">
+      <div class="flex items-center gap-1.5 min-w-0 flex-1">
         <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">新人檔案：</span>
         <div class="min-w-0 flex-1">
           <select id="record-selector" onchange="switchRecord(this.value)" class="w-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold text-sm rounded-lg px-2.5 py-1.5 border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-pro-accent truncate">
           </select>
         </div>
+        <button type="button" onclick="loadFromGoogleSheets()" title="從 Google 試算表讀取全部新人檔案" class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span class="hidden sm:inline">雲端讀取</span>
+        </button>
       </div>
 
       <!-- 快捷操作按鈕群 -->
@@ -497,15 +501,19 @@
         </div>
 
         <!-- Google Apps Script Web App URL 輸入 -->
-        <div class="space-y-2">
+        <div class="space-y-2.5">
           <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300">Google Apps Script 網頁應用程式網址 (Web App URL)：</label>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="gas-webhook-url" oninput="saveGasUrl(this.value)"
-              placeholder="https://script.google.com/macros/s/....../exec"
-              class="flex-1 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2.5 text-xs sm:text-sm font-mono focus:outline-none focus:border-emerald-500" />
+          <input type="text" id="gas-webhook-url" oninput="saveGasUrl(this.value)"
+            placeholder="https://script.google.com/macros/s/....../exec"
+            class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2.5 text-xs sm:text-sm font-mono focus:outline-none focus:border-emerald-500" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button type="button" id="sync-google-btn" onclick="syncToGoogleSheets()"
-              class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition shrink-0">
-              <span>☁️ 立即同步至 Google 試算表</span>
+              class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+              <span>☁️ 輸出並儲存至 Google 試算表</span>
+            </button>
+            <button type="button" id="load-google-btn" onclick="loadFromGoogleSheets()"
+              class="py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+              <span>📥 從 Google 試算表讀取全部新人</span>
             </button>
           </div>
           <div id="gas-sync-status" class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400"></div>
@@ -586,7 +594,7 @@
 
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] font-extrabold text-zinc-500">Apps Script 程式碼（自動建立標題列並依新人ID更新）：</span>
+          <span class="text-[11px] font-extrabold text-zinc-500">Apps Script 程式碼（支援雙向寫入及讀取全部新人檔案）：</span>
           <button type="button" onclick="copyGasScriptCode()" class="px-2.5 py-1 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-[11px] active:scale-95">
             📋 一鍵複製程式碼
           </button>
@@ -597,15 +605,17 @@
   var headers = payload.headers;
   var values = payload.values;
   var recordId = payload.recordId;
+  var rawJson = payload.rawJson || '';
 
-  // 若試算表為空，自動寫入第1列標題列
+  // 若試算表為空，自動寫入第1列標題列（最後一欄保存完整JSON供手機讀取還原）
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['紀錄ID'].concat(headers));
-    sheet.getRange(1, 1, 1, headers.length + 1).setFontWeight('bold').setBackground('#18181b').setFontColor('#ffffff');
+    var fullHeaders = ['紀錄ID'].concat(headers).concat(['_原始資料JSON']);
+    sheet.appendRow(fullHeaders);
+    sheet.getRange(1, 1, 1, fullHeaders.length).setFontWeight('bold').setBackground('#18181b').setFontColor('#ffffff');
     sheet.setFrozenRows(1);
   }
 
-  var rowData = [recordId].concat(values);
+  var rowData = [recordId].concat(values).concat([rawJson]);
   var dataRange = sheet.getDataRange().getValues();
   var existingRowIndex = -1;
 
@@ -625,13 +635,48 @@
 
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var callback = e && e.parameter && e.parameter.callback ? e.parameter.callback : '';
+  var lastRow = sheet.getLastRow();
+  var payload;
+
+  if (lastRow &lt; 2) {
+    payload = JSON.stringify({ status: 'ok', records: [] });
+  } else {
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    var records = [];
+
+    for (var i = 1; i &lt; data.length; i++) {
+      var row = data[i];
+      if (!row[0] &amp;&amp; !row[2]) continue;
+      var lastCell = row[row.length - 1];
+      records.push({
+        recordId: String(row[0] || ''),
+        headers: headers,
+        row: row,
+        rawJson: typeof lastCell === 'string' &amp;&amp; lastCell.indexOf('{') === 0 ? lastCell : ''
+      });
+    }
+    payload = JSON.stringify({ status: 'ok', records: records });
+  }
+
+  if (callback) {
+    return ContentService.createTextOutput(callback + '(' + payload + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(payload)
+    .setMimeType(ContentService.MimeType.JSON);
 }</pre>
       </div>
 
       <ol start="4" class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
-        <li>按右上角藍色按鈕 <strong>「部署」→「新增部署作業」</strong>。</li>
+        <li>按右上角藍色按鈕 <strong>「部署」→「管理部署作業」→ 點選右上角鉛筆圖示編輯 → 版本選「新版本」→「部署」</strong>（首次設定請按「新增部署作業」）。</li>
         <li>類型選擇 <strong>「網頁應用程式 (Web app)」</strong>，「執行身分」選<strong>「我」</strong>，「誰可以存取」務必選<strong>「所有人 (Anyone)」</strong>，然後按「部署」。</li>
-        <li>授權後複製產生的 <strong>網頁應用程式網址（結尾為 `/exec`）</strong>，貼回本頁面的輸入框即可！</li>
+        <li>授權後複製產生的 <strong>網頁應用程式網址（結尾為 `/exec`）</strong>，貼回本頁面的輸入框即可雙向寫入及讀取！</li>
       </ol>
 
       <div class="pt-2 flex justify-end">
@@ -2455,7 +2500,8 @@
       const payload = {
         recordId: rec.id,
         headers: cols.map(c => c.header),
-        values: cols.map(c => c.value)
+        values: cols.map(c => c.value),
+        rawJson: JSON.stringify(rec)
       };
 
       if (btn) {
@@ -2494,7 +2540,194 @@
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<span>☁️ 立即同步至 Google 試算表</span>';
+          btn.innerHTML = '<span>☁️ 輸出並儲存至 Google 試算表</span>';
+        }
+      }
+    }
+
+    // 從橫向儲存格反推還原為紀錄物件（兼容手動在 Google Sheets 填寫或舊版資料）
+    function buildRecordFromSheetRow(item) {
+      if (item.rawJson) {
+        try {
+          const parsed = JSON.parse(item.rawJson);
+          if (parsed && typeof parsed === 'object') {
+            return Object.assign(getEmptyRecord(item.recordId || parsed.id), parsed);
+          }
+        } catch (e) {
+          console.warn('rawJson parse fallback:', e);
+        }
+      }
+
+      const headers = item.headers || [];
+      const row = item.row || [];
+      const map = {};
+      headers.forEach((h, idx) => {
+        map[String(h).trim()] = row[idx] !== undefined && row[idx] !== null ? String(row[idx]).trim() : '';
+      });
+
+      const rec = getEmptyRecord(item.recordId || 'rec_sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
+      rec.coupleName = map['新人名字'] || '';
+      rec.weddingDate = map['婚禮日期'] ? map['婚禮日期'].slice(0, 10) : '';
+      rec.mua = map['化妝師MUA'] || '';
+      rec.familyRemark = map['家庭特別備註'] || '';
+      rec.generalNotes = map['全日特別備註'] || '';
+
+      const parseScore = (str, defVal) => {
+        const m = String(str || '').match(/(\d+)/);
+        return m ? Math.min(10, Math.max(0, parseInt(m[1], 10))) : defVal;
+      };
+      rec.brideParentsRel = parseScore(map['女家父母間評分'], 8);
+      rec.brideSelfParentsRel = parseScore(map['新娘與父母評分'], 8);
+      rec.groomParentsRel = parseScore(map['男家父母間評分'], 8);
+      rec.groomSelfParentsRel = parseScore(map['新郎與父母評分'], 8);
+
+      if (map['女家兄弟姊妹']) rec.brideSiblingsNote = map['女家兄弟姊妹'];
+      if (map['男家兄弟姊妹']) rec.groomSiblingsNote = map['男家兄弟姊妹'];
+
+      const headerToHybridKey = {
+        '服務方案': 'package',
+        '出門吉時': 'auspiciousLeaveTime',
+        '入門吉時': 'auspiciousEnterTime',
+        '出門地點(女家)': 'brideLocation',
+        '入門地點(男家)': 'groomLocation',
+        '證婚場地': 'ceremonyVenue',
+        '宴會場地及圍數': 'banquetVenue',
+        '姊妹人數': 'bridesmaidsCount',
+        '兄弟人數': 'groomsmenCount',
+        'Video Team': 'videoTeam',
+        'MC司儀': 'mc',
+        '大妗姐': 'daiKam',
+        '律師': 'celebrant',
+        'DECO': 'deco',
+        '花車': 'weddingCar',
+        '女家出門服裝': 'brideAttire',
+        '女家敬茶組合': 'brideTeaSets',
+        '女家家庭關係': 'brideParentsStatus',
+        '女家祖父母': 'brideGrandparents',
+        '男家出門服裝': 'groomAttire',
+        '男家敬茶組合': 'groomTeaSets',
+        '男家家庭關係': 'groomParentsStatus',
+        '男家祖父母': 'groomGrandparents',
+        'Crew Lunch': 'crewLunch',
+    function fetchJsonpFromGas(url) {
+      return new Promise((resolve, reject) => {
+        const cbName = '__gas_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+        const script = document.createElement('script');
+        const sep = url.includes('?') ? '&' : '?';
+        let settled = false;
+
+        const cleanup = () => {
+          delete window[cbName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        };
+
+        const timer = setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          reject(new Error('連線逾時，請確認 Apps Script 已更新為支援 callback 的新版程式碼並部署「新版本」。'));
+        }, 12000);
+
+        window[cbName] = (data) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          cleanup();
+          resolve(data);
+        };
+
+        script.onerror = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          cleanup();
+          reject(new Error('無法載入 Google Apps Script，請確認網址正確且權限設為「所有人」。'));
+        };
+
+        script.src = `${url}${sep}callback=${encodeURIComponent(cbName)}&_t=${Date.now()}`;
+        document.body.appendChild(script);
+      });
+    }
+
+    async function loadFromGoogleSheets() {
+      const urlInput = document.getElementById('gas-webhook-url');
+      const statusEl = document.getElementById('gas-sync-status');
+      const loadBtn = document.getElementById('load-google-btn');
+      const url = (urlInput ? urlInput.value : localStorage.getItem(GAS_URL_KEY) || '').trim();
+
+      if (!url || !url.startsWith('https://script.google.com/')) {
+        switchTab('export');
+        showToast('請先在「3. 試算表匯出」貼上 Google Apps Script 網址');
+        if (statusEl) {
+          statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
+          statusEl.textContent = '⚠️ 請先貼上 Google Apps Script 網址（並確認已加入新版 doGet 讀取功能並部署新版本）。';
+        }
+        return;
+      }
+
+      saveGasUrl(url);
+      if (loadBtn) {
+        loadBtn.disabled = true;
+        loadBtn.innerHTML = '<span>⏳ 正在從試算表讀取...</span>';
+      }
+      if (statusEl) {
+        statusEl.className = 'text-xs font-bold text-sky-600 dark:text-sky-400';
+        statusEl.textContent = '正在從 Google 試算表下載新人檔案...';
+      }
+      showToast('正在讀取 Google 試算表...');
+
+      try {
+        const data = await fetchJsonpFromGas(url);
+
+        if (!data || data.status !== 'ok' || !Array.isArray(data.records)) {
+          throw new Error('回傳格式不正確，請確認 Apps Script 已貼上新版 doGet 並部署新版本');
+        }
+
+        if (data.records.length === 0) {
+          if (statusEl) {
+            statusEl.className = 'text-xs font-bold text-amber-600 dark:text-amber-400';
+            statusEl.textContent = 'ℹ️ Google 試算表目前尚無任何新人紀錄。';
+          }
+          showToast('試算表目前沒有資料');
+          return;
+        }
+
+        const importedRecords = data.records.map(buildRecordFromSheetRow);
+
+        // 依 recordId 合併更新本機新人檔案清單（保留未上傳的本機檔案）
+        importedRecords.forEach(imp => {
+          const existingIdx = appState.records.findIndex(r => r.id === imp.id);
+          if (existingIdx >= 0) {
+            appState.records[existingIdx] = imp;
+          } else {
+            appState.records.unshift(imp);
+          }
+        });
+
+        // 自動切換至最新讀取到的第一筆新人檔案
+        appState.activeId = importedRecords[0].id;
+        saveToStorage();
+        populateFormFromRecord(getActiveRecord());
+        renderSummarySheet();
+        renderSpreadsheetExport();
+
+        const nowStr = formatDateTimeZh(Date.now());
+        if (statusEl) {
+          statusEl.className = 'text-xs font-extrabold text-emerald-600 dark:text-emerald-400';
+          statusEl.textContent = `✅ 已成功從 Google 試算表讀取 ${importedRecords.length} 份新人檔案！（讀取時間：${nowStr}）`;
+        }
+        showToast(`已成功載入 ${importedRecords.length} 份新人檔案！`);
+      } catch (err) {
+        console.error('Load from Google Sheets error:', err);
+        if (statusEl) {
+          statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
+          statusEl.textContent = `❌ ${err.message || '讀取失敗：請按右上角「設定教學 / 程式碼」複製新版 doGet 程式碼，並於「管理部署作業」部署為「新版本」。'}`;
+        }
+        showToast('讀取失敗，請更新 Apps Script 新版本');
+      } finally {
+        if (loadBtn) {
+          loadBtn.disabled = false;
+          loadBtn.innerHTML = '<span>📥 從 Google 試算表讀取全部新人</span>';
         }
       }
     }
