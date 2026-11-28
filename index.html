@@ -228,7 +228,11 @@
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span>即時自動儲存</span>
         </span>
-        <div class="flex items-center gap-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="syncToGoogleSheets()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold shadow-xs active:scale-95 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 13l4 4L19 7"/></svg>
+            <span>Save</span>
+          </button>
           <button type="button" onclick="toggleAllSections()" id="toggle-all-btn" class="text-zinc-600 dark:text-zinc-300 font-bold underline">
             全部收起
           </button>
@@ -429,6 +433,14 @@
           </div>
         </div>
       </section>
+
+      <!-- 手機輸入頁底部：一鍵 Save 至 Google 試算表 -->
+      <div class="pt-1 pb-2">
+        <button type="button" onclick="syncToGoogleSheets()" class="w-full py-3.5 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base shadow-md active:scale-[0.98] transition flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          <span>Save（輸出並保存至 Google 試算表）</span>
+        </button>
+      </div>
 
     </div>
 
@@ -1012,15 +1024,15 @@ function doGet(e) {
         placeholder: '車位數量或停車場備註'
       },
       morningTaxi: {
-        label: '19C. 早上的士 (是 / 否)',
+        label: '19C. 早上的士 (有 / 冇)',
         mode: 'single',
-        options: ['是', '否'],
+        options: ['有', '冇'],
         placeholder: '早上的士備註（例如：女家去男家 1 架）'
       },
       overtime: {
-        label: '19D. OT (是 / 否)',
+        label: '19D. OT (有 / 冇)',
         mode: 'single',
-        options: ['是', '否'],
+        options: ['有', '冇'],
         placeholder: 'OT 備註（例如：晚宴超時至 23:30）'
       },
       morningSession: {
@@ -1122,8 +1134,8 @@ function doGet(e) {
       rec.crewDinner = { selected: ['酒店/酒樓安排'], custom: '酒店提供員工餐' };
       rec.transport = { selected: ['跟花車/28座'], custom: '' };
       rec.parking = { selected: ['場地提供免費車位'], custom: '2個免費車位' };
-      rec.morningTaxi = { selected: ['是'], custom: '' };
-      rec.overtime = { selected: ['否'], custom: '' };
+      rec.morningTaxi = { selected: ['有'], custom: '' };
+      rec.overtime = { selected: ['冇'], custom: '' };
       rec.morningSession = { selected: ['化妝花絮', '玩新郎/開門利是', '讀愛的宣言', '女家敬茶', '出門大合照', '男家入門敬茶'], custom: '' };
       rec.ceremonyMarchIn = { selected: ['新娘由爸爸帶領進場'], custom: '' };
       rec.ceremonyRituals = { selected: ['讀誓詞', '交換戒指', '揭頭紗/Kiss', '簽結婚證書', '全場大合照'], custom: '' };
@@ -2306,6 +2318,7 @@ function doGet(e) {
       const url = (urlInput ? urlInput.value : localStorage.getItem(GAS_URL_KEY) || '').trim();
 
       if (!url || !url.startsWith('https://script.google.com/')) {
+        switchTab('export');
         showToast('請先貼上有效的 Google Apps Script 網址');
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
@@ -2318,6 +2331,7 @@ function doGet(e) {
       const rec = getActiveRecord();
       if (!rec) return;
 
+      showToast('正在儲存至 Google 試算表...');
       const cols = getSpreadsheetColumns(rec);
       const payload = {
         recordId: rec.id,
@@ -2588,9 +2602,9 @@ function doGet(e) {
         const nowStr = formatDateTimeZh(Date.now());
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-emerald-600 dark:text-emerald-400';
-          statusEl.textContent = `已成功從 Google 試算表讀取 ${importedRecords.length} 份新人檔案！（讀取時間：${nowStr}）`;
+          statusEl.textContent = `資料讀取成功！（共 ${importedRecords.length} 份新人檔案｜讀取時間：${nowStr}）`;
         }
-        showToast(isAutoLoad ? `已自動同步 Google 試算表（共 ${importedRecords.length} 份新人檔案）` : `已成功載入 ${importedRecords.length} 份新人檔案！`);
+        showToast('資料讀取成功');
       } catch (err) {
         console.error('Load from Google Sheets error:', err);
         if (statusEl) {
