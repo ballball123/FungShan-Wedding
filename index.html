@@ -98,8 +98,37 @@
         aspect-ratio: auto !important;
         overflow: visible !important;
       }
+      /* 強制列印與轉存 A5 PDF 時，所有原本的淺灰、白色及深色底區塊全部轉為高對比白底純黑字 */
+      #summary-card *,
+      #summary-card [class*="text-zinc-"],
+      #summary-card [class*="text-gray-"],
+      #summary-card [class*="text-slate-"],
+      #summary-card [class*="text-neutral-"],
+      #summary-card [class*="text-rose-"],
+      #summary-card [class*="text-sky-"],
+      #summary-card [class*="text-amber-"],
+      #summary-card [class*="text-orange-"],
+      #summary-card [class*="text-white"] {
+        color: #000000 !important;
+      }
+      #summary-card [class*="bg-zinc-900"],
+      #summary-card [class*="bg-zinc-800"],
+      #summary-card [class*="bg-zinc-700"],
+      #summary-card [class*="bg-zinc-200"],
+      #summary-card [class*="bg-zinc-100"],
+      #summary-card [class*="bg-zinc-50"],
+      #summary-card [class*="bg-rose-"],
+      #summary-card [class*="bg-sky-"],
+      #summary-card [class*="bg-amber-"],
+      #summary-card [class*="bg-red-"],
+      #summary-card [class*="bg-pro-accent"] {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        border-color: #374151 !important;
+      }
       #summary-card > div:first-child {
         padding: 7px 9px !important;
+        border-bottom: 1.5px solid #111827 !important;
       }
       #summary-card > div:last-child {
         padding: 7px 9px !important;
@@ -122,6 +151,40 @@
       #sum-card-bride,
       #sum-card-groom {
         display: block !important;
+      }
+      /* 列印或存為 A5 PDF 時，把所有淺灰色文字轉為純黑色，並確保背景高對比清晰易讀 */
+      #summary-card .text-zinc-200,
+      #summary-card .text-zinc-300,
+      #summary-card .text-zinc-400,
+      #summary-card .text-zinc-500,
+      #summary-card .text-zinc-600,
+      #summary-card .text-zinc-700,
+      #summary-card .text-zinc-800,
+      #summary-card .text-zinc-900,
+      #summary-card .dark\:text-zinc-200,
+      #summary-card .dark\:text-zinc-300,
+      #summary-card .dark\:text-zinc-400,
+      #summary-card .dark\:text-white {
+        color: #000000 !important;
+      }
+      /* 頂部深色標題欄與底部備註欄在列印時轉為白底黑字＋黑框，避免淺灰字在深底上印出模糊 */
+      #summary-card > div:first-child,
+      #summary-card .bg-zinc-900,
+      #summary-card .bg-zinc-800\/90,
+      #summary-card .bg-zinc-800 {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        border-color: #111827 !important;
+      }
+      #summary-card > div:first-child {
+        border-bottom: 1.5px solid #111827 !important;
+      }
+      #summary-card .bg-zinc-800\/90,
+      #summary-card .bg-zinc-800 {
+        border: 1px solid #9CA3AF !important;
+      }
+      #summary-card > div:last-child .bg-zinc-900 {
+        border: 1.5px solid #111827 !important;
       }
       .print-grid-2 {
         display: grid !important;
@@ -455,7 +518,7 @@
           <span>複製 WhatsApp 文字版</span>
         </button>
 
-        <button type="button" onclick="window.print()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+        <button type="button" onclick="printA5Summary()" class="flex-1 sm:flex-none px-3.5 py-2.5 rounded-xl bg-zinc-900 dark:bg-pro-accent hover:opacity-90 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
           <span>列印 / 存為 A5 PDF</span>
         </button>
@@ -2072,6 +2135,191 @@ function doGet(e) {
       `;
 
       document.getElementById('summary-card').innerHTML = html;
+    }
+
+    function buildStandaloneA5PrintHtml() {
+      const rec = getActiveRecord();
+      const cardEl = document.getElementById('summary-card');
+      const cardInner = cardEl ? cardEl.innerHTML : '';
+      const docTitle = `${rec?.weddingDate || '婚禮'} - ${rec?.coupleName || '新人'} A5 速查卡`;
+
+      return `<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${escapeHtml(docTitle)}</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A5 portrait;
+      margin: 5mm;
+    }
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background: #F4F4F5;
+      color: #000000;
+      margin: 0;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .toolbar {
+      width: 100%;
+      max-width: 148mm;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: #18181b;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .toolbar button {
+      background: #EA580C;
+      color: #ffffff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #print-sheet {
+      width: 138mm;
+      max-width: 100%;
+      background: #FFFFFF !important;
+      color: #000000 !important;
+      border: 1.5px solid #111827 !important;
+      border-radius: 8px !important;
+      overflow: visible !important;
+      font-size: 9px !important;
+      line-height: 1.28 !important;
+    }
+    #print-sheet *,
+    #print-sheet [class*="text-zinc-"],
+    #print-sheet [class*="text-gray-"],
+    #print-sheet [class*="text-rose-"],
+    #print-sheet [class*="text-sky-"],
+    #print-sheet [class*="text-amber-"],
+    #print-sheet [class*="text-orange-"],
+    #print-sheet [class*="text-white"] {
+      color: #000000 !important;
+    }
+    #print-sheet [class*="bg-zinc-900"],
+    #print-sheet [class*="bg-zinc-800"],
+    #print-sheet [class*="bg-zinc-700"],
+    #print-sheet [class*="bg-zinc-200"],
+    #print-sheet [class*="bg-zinc-100"],
+    #print-sheet [class*="bg-zinc-50"],
+    #print-sheet [class*="bg-rose-"],
+    #print-sheet [class*="bg-sky-"],
+    #print-sheet [class*="bg-amber-"],
+    #print-sheet [class*="bg-red-"],
+    #print-sheet [class*="bg-pro-accent"] {
+      background-color: #FFFFFF !important;
+      background: #FFFFFF !important;
+      border-color: #374151 !important;
+    }
+    #print-sheet > div:first-child {
+      padding: 7px 9px !important;
+      border-bottom: 1.5px solid #111827 !important;
+    }
+    #print-sheet > div:last-child {
+      padding: 7px 9px !important;
+    }
+    #print-sheet h1 {
+      font-size: 16px !important;
+      line-height: 1.2 !important;
+    }
+    .print-grid-2 {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 5px !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+      }
+      .toolbar {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span>A5 攝影師速查卡（純黑高對比列印版）</span>
+    <button type="button" onclick="window.print()">立即列印 / 存為 PDF</button>
+  </div>
+  <div id="print-sheet">${cardInner}</div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); }, 450);
+    };
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function printA5Summary() {
+      renderSummarySheet();
+      const htmlContent = buildStandaloneA5PrintHtml();
+
+      // 1. 嘗試開啟獨立 A5 列印視窗（可繞過沙盒 iframe 封鎖 window.print() 的限制）
+      try {
+        const printWin = window.open('', '_blank', 'width=760,height=960');
+        if (printWin && printWin.document) {
+          printWin.document.open();
+          printWin.document.write(htmlContent);
+          printWin.document.close();
+          showToast('已開啟 A5 列印預覽視窗');
+          return;
+        }
+      } catch (e) {
+        console.warn('Popup print window blocked, falling back:', e);
+      }
+
+      // 2. 若瀏覽器封鎖彈出視窗，改用隱藏列印 iframe 觸發列印
+      try {
+        let printFrame = document.getElementById('__a5_print_frame');
+        if (!printFrame) {
+          printFrame = document.createElement('iframe');
+          printFrame.id = '__a5_print_frame';
+          printFrame.style.position = 'fixed';
+          printFrame.style.right = '0';
+          printFrame.style.bottom = '0';
+          printFrame.style.width = '0';
+          printFrame.style.height = '0';
+          printFrame.style.border = '0';
+          document.body.appendChild(printFrame);
+        }
+        const frameDoc = printFrame.contentWindow || printFrame.contentDocument;
+        const doc = frameDoc.document || frameDoc;
+        doc.open();
+        doc.write(htmlContent);
+        doc.close();
+        setTimeout(() => {
+          try {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+          } catch (err) {
+            window.print();
+          }
+        }, 500);
+        showToast('正在啟動 A5 列印視窗...');
+      } catch (err) {
+        window.print();
+      }
     }
 
     function copyQuickText(text, label) {
