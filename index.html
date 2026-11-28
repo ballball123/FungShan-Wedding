@@ -186,7 +186,7 @@
           <span>1. 手機輸入</span>
         </button>
         <button type="button" id="tab-btn-summary" onclick="switchTab('summary')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
-          <span>2. 速查卡</span>
+          <span>2. Summary</span>
           <span class="w-1.5 h-1.5 rounded-full bg-pro-accent"></span>
         </button>
         <button type="button" id="tab-btn-export" onclick="switchTab('export')" class="py-2 px-2 rounded-lg text-xs sm:text-sm font-bold transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center gap-1">
@@ -401,7 +401,8 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
             <div id="hybrid-transport"></div>
             <div id="hybrid-parking"></div>
-            <div id="hybrid-morningTaxi" class="sm:col-span-2"></div>
+            <div id="hybrid-morningTaxi"></div>
+            <div id="hybrid-overtime"></div>
           </div>
         </div>
       </section>
@@ -533,7 +534,7 @@
   <div class="no-print fixed bottom-0 inset-x-0 z-40 bg-gradient-to-t from-pro-bg via-pro-bg/95 to-transparent dark:from-pro-darkBg dark:via-pro-darkBg/95 pt-4 pb-3 px-3 pointer-events-none">
     <div class="max-w-3xl mx-auto flex justify-center pointer-events-auto">
       <button type="button" id="floating-switch-btn" onclick="toggleTab()" class="w-full sm:w-auto sm:min-w-[320px] py-3 px-6 rounded-full bg-zinc-900 dark:bg-pro-accent text-white font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-95 transition border border-white/10">
-        <span id="floating-btn-text">生成並檢視：攝影師一頁速查卡</span>
+        <span id="floating-btn-text">生成並檢視：Summary</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
       </button>
     </div>
@@ -850,14 +851,14 @@ function doGet(e) {
       auspiciousLeaveTime: {
         label: '4A. 出門吉時 (女家)',
         mode: 'single',
-        options: ['0700-0900', '0800-1000', '0900-1100', '無吉時'],
-        placeholder: '自訂出門時段，例如：0730出門'
+        options: ['N/A'],
+        placeholder: '手動輸入出門吉時，例如：0730 或 0700-0900'
       },
       auspiciousEnterTime: {
         label: '4B. 入門吉時 (男家)',
         mode: 'single',
-        options: ['0700-0900', '0800-1000', '0900-1100', '無吉時'],
-        placeholder: '自訂入門時段，例如：0830入門'
+        options: ['N/A'],
+        placeholder: '手動輸入入門吉時，例如：0830 或 0800-1000'
       },
       brideLocation: {
         label: '5. 出門地點 (Bride\'s Location)',
@@ -947,8 +948,8 @@ function doGet(e) {
       brideTeaSets: {
         label: '12. 敬茶組合 (女)',
         mode: 'single',
-        options: ['1組', '2組', '3組', '4組', '5組+'],
-        placeholder: '敬茶細節（如：父母、婆婆）'
+        options: [],
+        placeholder: '手動輸入敬茶組合或對象（例如：3組：父母、婆婆、舅父）'
       },
       brideParentsStatus: {
         label: '13. 家庭關係 (女)',
@@ -971,8 +972,8 @@ function doGet(e) {
       groomTeaSets: {
         label: '12. 敬茶組合 (男)',
         mode: 'single',
-        options: ['1組', '2組', '3組', '4組', '5組+'],
-        placeholder: '敬茶細節（如：父母、婆婆）'
+        options: [],
+        placeholder: '手動輸入敬茶組合或對象（例如：2組：父母、嫲嫲）'
       },
       groomParentsStatus: {
         label: '13. 家庭關係 (男)',
@@ -1015,6 +1016,12 @@ function doGet(e) {
         mode: 'single',
         options: ['是', '否'],
         placeholder: '早上的士備註（例如：女家去男家 1 架）'
+      },
+      overtime: {
+        label: '19D. OT (是 / 否)',
+        mode: 'single',
+        options: ['是', '否'],
+        placeholder: 'OT 備註（例如：晚宴超時至 23:30）'
       },
       morningSession: {
         label: '20. 早上攝影環節',
@@ -1082,8 +1089,8 @@ function doGet(e) {
       rec.coupleName = 'Daisy & Kenny';
       rec.weddingDate = '2026-11-29';
       rec.package = { selected: ['Haft 2P1V'], custom: '' };
-      rec.auspiciousLeaveTime = { selected: ['0700-0900'], custom: '' };
-      rec.auspiciousEnterTime = { selected: ['0800-1000'], custom: '' };
+      rec.auspiciousLeaveTime = { selected: [], custom: '0700-0900' };
+      rec.auspiciousEnterTime = { selected: [], custom: '0800-1000' };
       rec.brideLocation = { selected: ['女家住宅'], custom: '天水圍嘉湖山莊賞湖居' };
       rec.groomLocation = { selected: ['男家住宅'], custom: '元朗朗屏8號' };
       rec.ceremonyVenue = { selected: ['已註冊'], custom: '香港逸東酒店 (Eaton HK) 17:30 證婚' };
@@ -1098,14 +1105,14 @@ function doGet(e) {
       rec.deco = { selected: ['有DECO'], custom: '' };
       rec.weddingCar = { selected: ['28座', '兄弟車'], custom: '28座接載兄弟姊妹' };
       rec.brideAttire = { selected: ['裙褂'], custom: '' };
-      rec.brideTeaSets = { selected: ['3組'], custom: '父母、婆婆、舅父' };
+      rec.brideTeaSets = { selected: [], custom: '3組（父母、婆婆、舅父）' };
       rec.brideParentsStatus = { selected: ['父母 BOTH'], custom: '' };
       rec.brideParentsRel = 9;
       rec.brideSelfParentsRel = 9;
       rec.brideSiblingsList = [{ role: '妹妹', status: '單身', kids: 0 }];
       rec.brideGrandparents = { selected: ['婆婆'], custom: '' };
       rec.groomAttire = { selected: ['西裝'], custom: '' };
-      rec.groomTeaSets = { selected: ['2組'], custom: '父母、嫲嫲' };
+      rec.groomTeaSets = { selected: [], custom: '2組（父母、嫲嫲）' };
       rec.groomParentsStatus = { selected: ['父母 BOTH'], custom: '' };
       rec.groomParentsRel = 8;
       rec.groomSelfParentsRel = 9;
@@ -1116,6 +1123,7 @@ function doGet(e) {
       rec.transport = { selected: ['跟花車/28座'], custom: '' };
       rec.parking = { selected: ['場地提供免費車位'], custom: '2個免費車位' };
       rec.morningTaxi = { selected: ['是'], custom: '' };
+      rec.overtime = { selected: ['否'], custom: '' };
       rec.morningSession = { selected: ['化妝花絮', '玩新郎/開門利是', '讀愛的宣言', '女家敬茶', '出門大合照', '男家入門敬茶'], custom: '' };
       rec.ceremonyMarchIn = { selected: ['新娘由爸爸帶領進場'], custom: '' };
       rec.ceremonyRituals = { selected: ['讀誓詞', '交換戒指', '揭頭紗/Kiss', '簽結婚證書', '全場大合照'], custom: '' };
@@ -1222,6 +1230,7 @@ function doGet(e) {
           '團隊交通': 'transport',
           '泊車車位': 'parking',
           '早上的士': 'morningTaxi',
+          'OT': 'overtime',
           '早上攝影環節': 'morningSession',
           '證婚進場': 'ceremonyMarchIn',
           '證婚儀式': 'ceremonyRituals',
@@ -1288,6 +1297,12 @@ function doGet(e) {
       populateFormFromRecord(getActiveRecord());
       renderRecordSelector();
       renderSummarySheet();
+
+      // 每次開啟時自動讀取 Google 試算表的全部資料
+      const savedGasUrl = (localStorage.getItem(GAS_URL_KEY) || '').trim();
+      if (savedGasUrl && savedGasUrl.startsWith('https://script.google.com/')) {
+        loadFromGoogleSheets(true);
+      }
     }
 
     function toggleSectionBody(bodyId, chevId) {
@@ -1547,14 +1562,12 @@ function doGet(e) {
 
         const inputHtml = cfg.multiline
           ? `<textarea data-hybrid-custom="${key}" rows="2" placeholder="${cfg.placeholder}" class="w-full mt-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent"></textarea>`
-          : `<input type="text" data-hybrid-custom="${key}" placeholder="${cfg.placeholder}" class="w-full mt-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent" />`;
+          : `<input type="text" data-hybrid-custom="${key}" placeholder="${cfg.placeholder}" class="w-full ${cfg.options.length > 0 ? 'mt-2' : ''} rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent" />`;
 
         container.innerHTML = `
           <div>
             <label class="block text-xs font-extrabold text-zinc-700 dark:text-zinc-300 mb-2">${cfg.label}</label>
-            <div class="flex flex-wrap gap-2">
-              ${pillsHtml}
-            </div>
+            ${cfg.options.length > 0 ? `<div class="flex flex-wrap gap-2">${pillsHtml}</div>` : ''}
             ${hotelPickerHtml}
             ${churchPickerHtml}
             ${inputHtml}
@@ -1616,242 +1629,58 @@ function doGet(e) {
     }
 
     // ==========================================
-    // 4B. 精簡版父母關係 10 分制輸入
+    // 4B. 精簡版父母關係 ?/10 手動輸入
     // ==========================================
     function renderRatingComponents() {
       Object.entries(RATING_FIELDS).forEach(([key, label]) => {
         const container = document.getElementById(`rating-${key}`);
         if (!container) return;
 
-        const quickPresets = [3, 5, 7, 8, 9, 10].map(n => `
-          <button type="button"
-            data-rating-key="${key}"
-            data-rating-val="${n}"
-            onclick="setRating('${key}', ${n})"
-            class="flex-1 h-9 rounded-lg text-xs font-extrabold transition-all border active:scale-95">
-            ${n}
-          </button>
-        `).join('');
-
         container.innerHTML = `
-          <div class="space-y-2">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-extrabold text-zinc-700 dark:text-zinc-300">${label}</span>
-              <div class="flex items-center gap-1.5">
-                <button type="button" onclick="adjustRating('${key}', -1)"
-                  class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 font-black text-base active:scale-90">
-                  －
-                </button>
-                <div class="flex items-center gap-0.5 bg-zinc-100 dark:bg-zinc-800 px-2.5 h-9 rounded-lg border border-zinc-300 dark:border-zinc-700">
-                  <input type="number" min="0" max="10" inputmode="numeric"
-                    id="rating-input-${key}"
-                    oninput="handleRatingInput('${key}', this.value)"
-                    class="w-7 bg-transparent text-center font-black text-base focus:outline-none text-zinc-900 dark:text-white" />
-                  <span class="text-xs font-extrabold text-zinc-500">/10</span>
-                </div>
-                <button type="button" onclick="adjustRating('${key}', 1)"
-                  class="w-9 h-9 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white font-black text-base active:scale-90">
-                  ＋
-                </button>
-              </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-zinc-700 dark:text-zinc-300">${label}</span>
+            <div class="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-3 h-10 rounded-xl border border-zinc-300 dark:border-zinc-700 focus-within:border-pro-accent">
+              <input type="number" min="0" max="10" inputmode="numeric" placeholder="?"
+                id="rating-input-${key}"
+                oninput="handleRatingInput('${key}', this.value)"
+                class="w-9 bg-transparent text-center font-black text-base focus:outline-none text-zinc-900 dark:text-white" />
+              <span class="text-xs font-extrabold text-zinc-500">/10</span>
             </div>
-            <div class="flex gap-1.5">${quickPresets}</div>
           </div>
         `;
       });
     }
 
-    function adjustRating(key, delta) {
-      const rec = getActiveRecord();
-      const cur = rec[key] !== undefined && rec[key] !== null ? Number(rec[key]) : 8;
-      const next = Math.min(10, Math.max(0, cur + delta));
-      setRating(key, next);
-    }
-
     function handleRatingInput(key, rawVal) {
-      if (rawVal === '') return;
+      const rec = getActiveRecord();
+      if (rawVal === '') {
+        rec[key] = '';
+        updateRatingVisuals(key);
+        saveToStorage();
+        return;
+      }
       let num = parseInt(rawVal, 10);
       if (isNaN(num)) return;
       if (num > 10) num = 10;
       if (num < 0) num = 0;
-      setRating(key, num);
-    }
-
-    function setRating(key, val) {
-      const rec = getActiveRecord();
-      rec[key] = val;
+      rec[key] = num;
       updateRatingVisuals(key);
       saveToStorage();
     }
 
     function updateRatingVisuals(key) {
       const rec = getActiveRecord();
-      const val = rec[key] !== undefined && rec[key] !== null ? Number(rec[key]) : 8;
+      const raw = rec[key];
+      const hasVal = raw !== undefined && raw !== null && raw !== '';
+      const val = hasVal ? Number(raw) : '';
       const inputEl = document.getElementById(`rating-input-${key}`);
       if (inputEl && document.activeElement !== inputEl) {
         inputEl.value = val;
       }
       if (inputEl) {
-        inputEl.className = val <= 5
-          ? 'w-7 bg-transparent text-center font-black text-sm focus:outline-none text-red-600 dark:text-red-400'
-          : 'w-7 bg-transparent text-center font-black text-sm focus:outline-none text-emerald-700 dark:text-emerald-400';
-      }
-
-      document.querySelectorAll(`[data-rating-key="${key}"]`).forEach(btn => {
-        const bVal = Number(btn.getAttribute('data-rating-val'));
-        if (bVal === val) {
-          btn.className = val <= 5
-            ? 'flex-1 h-9 rounded-lg text-xs font-black bg-red-600 text-white border-red-600 shadow-xs active:scale-95'
-            : 'flex-1 h-9 rounded-lg text-xs font-black bg-zinc-900 dark:bg-pro-accent text-white border-zinc-900 dark:border-pro-accent shadow-xs active:scale-95';
-        } else {
-          btn.className = 'flex-1 h-9 rounded-lg text-xs font-bold bg-zinc-50 dark:bg-zinc-800/70 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 active:scale-95';
-        }
-      });
-    }
-
-    // ==========================================
-    // 4C. 親生兄弟姊妹多項組合快選器
-    // ==========================================
-    const SIBLING_ROLES = ['哥哥', '弟弟', '姐姐', '妹妹'];
-    const SIBLING_STATUSES = ['單身', '+BF', '+GF', '已婚'];
-    const SIBLING_KIDS = [
-      { val: 0, label: '無小朋友' },
-      { val: 1, label: '+1小朋友' },
-      { val: 2, label: '+2小朋友' },
-      { val: 3, label: '+3小朋友' }
-    ];
-
-    function renderSiblingsBuilders() {
-      ['bride', 'groom'].forEach(side => {
-        const container = document.getElementById(`siblings-builder-${side}`);
-        if (!container) return;
-
-        const title = side === 'bride' ? '15. 親生兄弟姊妹 (女家)' : '15. 親生兄弟姊妹 (男家)';
-        container.innerHTML = `
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold text-zinc-700 dark:text-zinc-300">${title}</label>
-              <button type="button" onclick="setOnlyChild('${side}')" class="text-[11px] font-bold px-2 py-0.5 rounded bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-300">
-                設為獨生
-              </button>
-            </div>
-
-            <div id="siblings-rows-${side}" class="space-y-2"></div>
-
-            <div class="grid grid-cols-4 gap-1.5 pt-0.5">
-              ${SIBLING_ROLES.map(role => `
-                <button type="button" onclick="addSiblingRow('${side}', '${role}')"
-                  class="py-2.5 px-2 rounded-xl text-xs font-extrabold bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 text-zinc-800 dark:text-zinc-100 hover:border-pro-accent active:scale-95 transition flex items-center justify-center gap-0.5 shadow-2xs">
-                  <span class="text-pro-accent">＋</span><span>${role}</span>
-                </button>
-              `).join('')}
-            </div>
-
-            <input type="text" id="siblings-note-${side}"
-              oninput="updateSiblingsNote('${side}', this.value)"
-              placeholder="自由補充（例如：細妹帶埋BB、家姐做證婚人）"
-              class="w-full rounded-xl bg-white/90 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3.5 py-2.5 text-base font-medium focus:outline-none focus:border-pro-accent" />
-          </div>
-        `;
-      });
-    }
-
-    function renderSiblingRowsUI(side) {
-      const rec = getActiveRecord();
-      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
-      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
-      if (!Array.isArray(rec[listKey])) rec[listKey] = [];
-
-      const rowsContainer = document.getElementById(`siblings-rows-${side}`);
-      const noteEl = document.getElementById(`siblings-note-${side}`);
-      if (noteEl && document.activeElement !== noteEl) {
-        noteEl.value = rec[noteKey] || '';
-      }
-      if (!rowsContainer) return;
-
-      if (rec[listKey].length === 0) {
-        const isOnly = (rec[noteKey] || '').includes('獨生');
-        rowsContainer.innerHTML = `
-          <div class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 bg-white/60 dark:bg-zinc-900/50 rounded-lg px-2.5 py-2 border border-dashed border-zinc-300 dark:border-zinc-700">
-            ${isOnly ? '已標記為獨生子女（如需新增可按下方按鈕）' : '尚未新增兄弟姊妹，請按下方「＋ 哥哥 / 弟弟 / 姐姐 / 妹妹」快速加入'}
-          </div>
-        `;
-        return;
-      }
-
-      rowsContainer.innerHTML = rec[listKey].map((item, idx) => `
-        <div class="bg-white dark:bg-zinc-900 rounded-xl p-3 border border-zinc-200 dark:border-zinc-700 shadow-2xs space-y-2.5">
-          <div class="flex items-center justify-between gap-1.5">
-            <div class="flex items-center gap-1 flex-wrap">
-              <span class="text-xs font-black text-zinc-400 mr-0.5">#${idx + 1}</span>
-              ${SIBLING_ROLES.map(r => `
-                <button type="button" onclick="updateSiblingItem('${side}', ${idx}, 'role', '${r}')"
-                  class="px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition active:scale-95 ${item.role === r ? 'bg-zinc-900 dark:bg-pro-accent text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300'}">
-                  ${r}
-                </button>
-              `).join('')}
-            </div>
-
-            <button type="button" onclick="removeSiblingRow('${side}', ${idx})" title="移除此位"
-              class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 font-black text-sm flex items-center justify-center hover:bg-rose-100 shrink-0">
-              ✕
-            </button>
-          </div>
-
-          <div class="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-            <div class="grid grid-cols-4 gap-1.5">
-              ${SIBLING_STATUSES.map(st => `
-                <button type="button" onclick="updateSiblingItem('${side}', ${idx}, 'status', '${st}')"
-                  class="py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${item.status === st ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'}">
-                  ${st}
-                </button>
-              `).join('')}
-            </div>
-
-            <div class="grid grid-cols-4 gap-1.5">
-              ${SIBLING_KIDS.map(k => `
-                <button type="button" onclick="updateSiblingItem('${side}', ${idx}, 'kids', ${k.val})"
-                  class="py-1.5 rounded-lg text-xs font-bold border transition active:scale-95 ${Number(item.kids || 0) === k.val ? 'bg-amber-500 text-white border-amber-500' : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'}">
-                  ${k.val === 0 ? '無仔女' : '+' + k.val + '小朋友'}
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function addSiblingRow(side, defaultRole = '姐姐') {
-      const rec = getActiveRecord();
-      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
-      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
-      if (!Array.isArray(rec[listKey])) rec[listKey] = [];
-      if (rec[noteKey] === '獨生') rec[noteKey] = '';
-
-      rec[listKey].push({
-        role: defaultRole,
-        status: '單身',
-        kids: 0
-      });
-      renderSiblingRowsUI(side);
-      saveToStorage();
-    }
-
-    function removeSiblingRow(side, idx) {
-      const rec = getActiveRecord();
-      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
-      rec[listKey].splice(idx, 1);
-      renderSiblingRowsUI(side);
-      saveToStorage();
-    }
-
-    function updateSiblingItem(side, idx, field, val) {
-      const rec = getActiveRecord();
-      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
-      if (rec[listKey] && rec[listKey][idx]) {
-        rec[listKey][idx][field] = val;
-        renderSiblingRowsUI(side);
-        saveToStorage();
+        inputEl.className = (hasVal && Number(val) <= 5)
+          ? 'w-9 bg-transparent text-center font-black text-base focus:outline-none text-red-600 dark:text-red-400'
+          : 'w-9 bg-transparent text-center font-black text-base focus:outline-none text-emerald-700 dark:text-emerald-400';
       }
     }
 
@@ -1995,10 +1824,10 @@ function doGet(e) {
       const isNoParking = parkingText.includes('冇車位') || parkingText.includes('自費');
 
       const warnings = [];
-      if (rec.brideParentsRel <= 5) warnings.push(`女家父母關係 ${rec.brideParentsRel}/10`);
-      if (rec.brideSelfParentsRel <= 5) warnings.push(`新娘與父母 ${rec.brideSelfParentsRel}/10`);
-      if (rec.groomParentsRel <= 5) warnings.push(`男家父母關係 ${rec.groomParentsRel}/10`);
-      if (rec.groomSelfParentsRel <= 5) warnings.push(`新郎與父母 ${rec.groomSelfParentsRel}/10`);
+      if (rec.brideParentsRel !== '' && rec.brideParentsRel !== null && Number(rec.brideParentsRel) <= 5) warnings.push(`女家父母關係 ${rec.brideParentsRel}/10`);
+      if (rec.brideSelfParentsRel !== '' && rec.brideSelfParentsRel !== null && Number(rec.brideSelfParentsRel) <= 5) warnings.push(`新娘與父母 ${rec.brideSelfParentsRel}/10`);
+      if (rec.groomParentsRel !== '' && rec.groomParentsRel !== null && Number(rec.groomParentsRel) <= 5) warnings.push(`男家父母關係 ${rec.groomParentsRel}/10`);
+      if (rec.groomSelfParentsRel !== '' && rec.groomSelfParentsRel !== null && Number(rec.groomSelfParentsRel) <= 5) warnings.push(`新郎與父母 ${rec.groomSelfParentsRel}/10`);
       if ((rec.brideParentsStatus?.selected || []).some(s => s.includes('ONLY') || s.includes('離婚'))) {
         warnings.push(`女家：${rec.brideParentsStatus.selected.join('/')}`);
       }
@@ -2034,8 +1863,10 @@ function doGet(e) {
       ];
 
       const renderScoreBadge = (score) => {
-        const isLow = Number(score) <= 5;
-        return `<span class="inline-block px-2 py-0.5 rounded-md font-black text-xs sm:text-sm ${isLow ? 'bg-red-600 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white'}">${score}/10</span>`;
+        const hasScore = score !== '' && score !== null && score !== undefined;
+        const displayScore = hasScore ? score : '?';
+        const isLow = hasScore && Number(score) <= 5;
+        return `<span class="inline-block px-2 py-0.5 rounded-md font-black text-xs sm:text-sm ${isLow ? 'bg-red-600 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white'}">${displayScore}/10</span>`;
       };
 
       const brideLocText = formatHybrid(rec.brideLocation);
@@ -2159,91 +1990,14 @@ function doGet(e) {
                 <span class="font-extrabold text-zinc-500 dark:text-zinc-400 shrink-0">交通：</span>
                 <span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.transport))}</span>
               </div>
-              <div class="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600">
-                <span class="font-extrabold text-zinc-500 dark:text-zinc-400">早上的士：</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.morningTaxi, '未定'))}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. 團隊與合作單位速查列 -->
-          <div class="border border-zinc-200 dark:border-zinc-700 rounded-2xl p-3.5">
-            <div class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase mb-2.5">團隊與單位速查 (Vendors & Crew)</div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-sm">
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
-                <span class="text-zinc-500 block text-[11px] font-bold">姊妹 / 兄弟</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.bridesmaidsCount, '0'))}姊妹 / ${escapeHtml(formatHybrid(rec.groomsmenCount, '0'))}兄弟</span>
-              </div>
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
-                <span class="text-zinc-500 block text-[11px] font-bold">Video Team</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.videoTeam))}</span>
-              </div>
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
-                <span class="text-zinc-500 block text-[11px] font-bold">化妝師 MUA</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(rec.mua || '-')}</span>
-              </div>
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
-                <span class="text-zinc-500 block text-[11px] font-bold">MC 司儀</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.mc))}</span>
-              </div>
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
-                <span class="text-zinc-500 block text-[11px] font-bold">大妗姐</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.daiKam))}</span>
-              </div>
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl">
-                <span class="text-zinc-500 block text-[11px] font-bold">律師</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.celebrant))}</span>
-              </div>
-              <div class="bg-zinc-50 dark:bg-zinc-800/70 px-3 py-2 rounded-xl col-span-2">
-                <span class="text-zinc-500 block text-[11px] font-bold">DECO 佈置</span>
-                <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.deco))}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 4. 雙方家庭與服裝對照表 -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-zinc-500 dark:text-zinc-400 uppercase">雙方家庭與敬茶細節</span>
-              <div class="no-print md:hidden flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg text-xs font-extrabold">
-                <button type="button" onclick="toggleSummaryFamily('all')" id="sum-fam-all" class="px-2.5 py-1 rounded bg-zinc-900 dark:bg-pro-accent text-white">全部</button>
-                <button type="button" onclick="toggleSummaryFamily('bride')" id="sum-fam-bride" class="px-2.5 py-1 rounded text-rose-600 dark:text-rose-400">女家</button>
-                <button type="button" onclick="toggleSummaryFamily('groom')" id="sum-fam-groom" class="px-2.5 py-1 rounded text-sky-600 dark:text-sky-400">男家</button>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-3">
-              <div id="sum-card-bride" class="rounded-2xl border-2 border-rose-200 dark:border-rose-900/60 overflow-hidden">
-                <div class="bg-rose-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
-                  <span>女家 (BRIDE)</span>
-                  <span class="bg-black/20 px-2 py-0.5 rounded text-xs">敬茶：${escapeHtml(formatHybrid(rec.brideTeaSets))}</span>
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600">
+                  <span class="font-extrabold text-zinc-500 dark:text-zinc-400">早上的士：</span>
+                  <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.morningTaxi, '未定'))}</span>
                 </div>
-                <div class="p-3.5 space-y-2 text-sm bg-rose-50/40 dark:bg-rose-950/15">
-                  <div><span class="text-zinc-500 font-bold">出門服裝：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.brideAttire))}</span></div>
-                  <div><span class="text-zinc-500 font-bold">家庭狀況：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.brideParentsStatus))}</span></div>
-                  <div class="flex flex-wrap items-center gap-2 py-1 border-y border-rose-100 dark:border-rose-900/40">
-                    <div><span class="text-zinc-500 font-bold">父母間：</span>${renderScoreBadge(rec.brideParentsRel)}</div>
-                    <div><span class="text-zinc-500 font-bold">女與父母：</span>${renderScoreBadge(rec.brideSelfParentsRel)}</div>
-                  </div>
-                  <div><span class="text-zinc-500 font-bold">兄弟姊妹：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatSiblingsSummary(rec, 'bride'))}</span></div>
-                  <div><span class="text-zinc-500 font-bold">祖父母：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.brideGrandparents))}</span></div>
-                </div>
-              </div>
-
-              <div id="sum-card-groom" class="rounded-2xl border-2 border-sky-200 dark:border-sky-900/60 overflow-hidden">
-                <div class="bg-sky-600 text-white px-3.5 py-2 font-extrabold text-sm flex items-center justify-between">
-                  <span>男家 (GROOM)</span>
-                  <span class="bg-black/20 px-2 py-0.5 rounded text-xs">敬茶：${escapeHtml(formatHybrid(rec.groomTeaSets))}</span>
-                </div>
-                <div class="p-3.5 space-y-2 text-sm bg-sky-50/40 dark:bg-sky-950/15">
-                  <div><span class="text-zinc-500 font-bold">出門服裝：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.groomAttire))}</span></div>
-                  <div><span class="text-zinc-500 font-bold">家庭狀況：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.groomParentsStatus))}</span></div>
-                  <div class="flex flex-wrap items-center gap-2 py-1 border-y border-sky-100 dark:border-sky-900/40">
-                    <div><span class="text-zinc-500 font-bold">父母間：</span>${renderScoreBadge(rec.groomParentsRel)}</div>
-                    <div><span class="text-zinc-500 font-bold">仔與父母：</span>${renderScoreBadge(rec.groomSelfParentsRel)}</div>
-                  </div>
-                  <div><span class="text-zinc-500 font-bold">兄弟姊妹：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatSiblingsSummary(rec, 'groom'))}</span></div>
-                  <div><span class="text-zinc-500 font-bold">祖父母：</span><span class="font-extrabold text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.groomGrandparents))}</span></div>
+                <div class="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600">
+                  <span class="font-extrabold text-zinc-500 dark:text-zinc-400">OT：</span>
+                  <span class="font-black text-zinc-900 dark:text-white">${escapeHtml(formatHybrid(rec.overtime, '未定'))}</span>
                 </div>
               </div>
             </div>
@@ -2400,7 +2154,7 @@ function doGet(e) {
         formView.classList.remove('hidden');
         if (mobileNav) mobileNav.classList.remove('hidden');
         btnForm.className = activeTabCls;
-        if (floatingText) floatingText.textContent = '生成並檢視：攝影師一頁速查卡';
+        if (floatingText) floatingText.textContent = '生成並檢視：Summary';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
@@ -2452,15 +2206,15 @@ function doGet(e) {
         { header: '女家出門服裝', value: formatHybrid(rec.brideAttire, '') },
         { header: '女家敬茶組合', value: formatHybrid(rec.brideTeaSets, '') },
         { header: '女家家庭關係', value: formatHybrid(rec.brideParentsStatus, '') },
-        { header: '女家父母間評分', value: `${rec.brideParentsRel}/10` },
-        { header: '新娘與父母評分', value: `${rec.brideSelfParentsRel}/10` },
+        { header: '女家父母間評分', value: `${rec.brideParentsRel !== '' && rec.brideParentsRel !== null ? rec.brideParentsRel : '?'}/10` },
+        { header: '新娘與父母評分', value: `${rec.brideSelfParentsRel !== '' && rec.brideSelfParentsRel !== null ? rec.brideSelfParentsRel : '?'}/10` },
         { header: '女家兄弟姊妹', value: formatSiblingsSummary(rec, 'bride') === '-' ? '' : formatSiblingsSummary(rec, 'bride') },
         { header: '女家祖父母', value: formatHybrid(rec.brideGrandparents, '') },
         { header: '男家出門服裝', value: formatHybrid(rec.groomAttire, '') },
         { header: '男家敬茶組合', value: formatHybrid(rec.groomTeaSets, '') },
         { header: '男家家庭關係', value: formatHybrid(rec.groomParentsStatus, '') },
-        { header: '男家父母間評分', value: `${rec.groomParentsRel}/10` },
-        { header: '新郎與父母評分', value: `${rec.groomSelfParentsRel}/10` },
+        { header: '男家父母間評分', value: `${rec.groomParentsRel !== '' && rec.groomParentsRel !== null ? rec.groomParentsRel : '?'}/10` },
+        { header: '新郎與父母評分', value: `${rec.groomSelfParentsRel !== '' && rec.groomSelfParentsRel !== null ? rec.groomSelfParentsRel : '?'}/10` },
         { header: '男家兄弟姊妹', value: formatSiblingsSummary(rec, 'groom') === '-' ? '' : formatSiblingsSummary(rec, 'groom') },
         { header: '男家祖父母', value: formatHybrid(rec.groomGrandparents, '') },
         { header: '家庭特別備註', value: rec.familyRemark || '' },
@@ -2469,6 +2223,7 @@ function doGet(e) {
         { header: '團隊交通', value: formatHybrid(rec.transport, '') },
         { header: '泊車車位', value: formatHybrid(rec.parking, '') },
         { header: '早上的士', value: formatHybrid(rec.morningTaxi, '') },
+        { header: 'OT', value: formatHybrid(rec.overtime, '') },
         { header: '早上攝影環節', value: formatHybrid(rec.morningSession, '') },
         { header: '證婚進場', value: formatHybrid(rec.ceremonyMarchIn, '') },
         { header: '證婚儀式', value: formatHybrid(rec.ceremonyRituals, '') },
@@ -2646,23 +2401,140 @@ function doGet(e) {
           reject(new Error('無法載入 Google Apps Script，請確認網址正確且權限設為「所有人」。'));
         };
 
-        script.src = `${url}${sep}callback=${encodeURIComponent(cbName)}&_t=${Date.now()}`;
+        script.src = `${url}${sep}callback=${cbName}&_t=${Date.now()}`;
         document.body.appendChild(script);
       });
     }
 
-    async function loadFromGoogleSheets() {
+    // ==========================================
+    // 4C. 親生兄弟姊妹互動快選器
+    // ==========================================
+    const SIBLING_ROLES = ['哥哥', '姐姐', '弟弟', '妹妹'];
+    const SIBLING_STATUSES = ['單身', '拍拖', '已婚'];
+
+    function renderSiblingsBuilders() {
+      ['bride', 'groom'].forEach(side => {
+        const container = document.getElementById(`siblings-builder-${side}`);
+        if (!container) return;
+
+        const isBride = side === 'bride';
+        const label = isBride ? '15. 親生兄弟姊妹 (女)' : '15. 親生兄弟姊妹 (男)';
+
+        container.innerHTML = `
+          <div class="space-y-2.5 bg-white/80 dark:bg-zinc-900/80 p-3 rounded-xl border ${isBride ? 'border-rose-200/80 dark:border-zinc-800' : 'border-sky-200/80 dark:border-zinc-800'}">
+            <div class="flex items-center justify-between gap-2">
+              <label class="text-xs font-extrabold text-zinc-700 dark:text-zinc-300">${label}</label>
+              <button type="button" onclick="setOnlyChild('${side}')"
+                class="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-[11px] font-extrabold text-zinc-700 dark:text-zinc-300 active:scale-95 transition">
+                獨生子女
+              </button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              ${SIBLING_ROLES.map(role => `
+                <button type="button" onclick="addSiblingMember('${side}', '${role}')"
+                  class="py-2 rounded-xl bg-zinc-900 dark:bg-zinc-800 hover:bg-pro-accent text-white text-xs font-extrabold active:scale-95 transition">
+                  ＋${role}
+                </button>
+              `).join('')}
+            </div>
+            <div id="siblings-list-${side}" class="space-y-2"></div>
+            <input type="text" id="siblings-note-${side}" oninput="updateSiblingsNote('${side}', this.value)"
+              placeholder="兄弟姊妹補充備註（例如：獨生、大嫂有孕...）"
+              class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-sm font-medium focus:outline-none focus:border-pro-accent" />
+          </div>
+        `;
+      });
+    }
+
+    function addSiblingMember(side, role) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      if (!Array.isArray(rec[listKey])) rec[listKey] = [];
+      if (rec[noteKey] === '獨生') rec[noteKey] = '';
+      rec[listKey].push({ role, status: '單身', kids: 0 });
+      renderSiblingRowsUI(side);
+      saveToStorage();
+    }
+
+    function removeSiblingMember(side, idx) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      if (Array.isArray(rec[listKey])) {
+        rec[listKey].splice(idx, 1);
+      }
+      renderSiblingRowsUI(side);
+      saveToStorage();
+    }
+
+    function updateSiblingField(side, idx, field, val) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      if (!rec[listKey] || !rec[listKey][idx]) return;
+      rec[listKey][idx][field] = val;
+      renderSiblingRowsUI(side);
+      saveToStorage();
+    }
+
+    function renderSiblingRowsUI(side) {
+      const rec = getActiveRecord();
+      const listKey = side === 'bride' ? 'brideSiblingsList' : 'groomSiblingsList';
+      const noteKey = side === 'bride' ? 'brideSiblingsNote' : 'groomSiblingsNote';
+      const listEl = document.getElementById(`siblings-list-${side}`);
+      const noteEl = document.getElementById(`siblings-note-${side}`);
+      if (noteEl && document.activeElement !== noteEl) {
+        noteEl.value = rec[noteKey] || '';
+      }
+      if (!listEl) return;
+
+      const list = Array.isArray(rec[listKey]) ? rec[listKey] : [];
+      if (list.length === 0) {
+        listEl.innerHTML = `<div class="text-[11px] font-bold text-zinc-400 text-center py-1">點選上方按鈕新增兄弟姊妹</div>`;
+        return;
+      }
+
+      listEl.innerHTML = list.map((item, idx) => `
+        <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2.5 py-0.5 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white text-xs font-black">${escapeHtml(item.role)}</span>
+            <div class="flex items-center gap-1">
+              ${SIBLING_STATUSES.map(st => `
+                <button type="button" onclick="updateSiblingField('${side}', ${idx}, 'status', '${st}')"
+                  class="px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${item.status === st ? 'bg-zinc-900 dark:bg-pro-accent text-white border-zinc-900 dark:border-pro-accent' : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'}">
+                  ${st}
+                </button>
+              `).join('')}
+            </div>
+            <button type="button" onclick="removeSiblingMember('${side}', ${idx})" class="text-xs font-extrabold text-rose-500 px-1.5 py-0.5">刪除</button>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-zinc-500">同行小朋友人數：</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="updateSiblingField('${side}', ${idx}, 'kids', Math.max(0, ${Number(item.kids) || 0} - 1))"
+                class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 font-black">－</button>
+              <span class="font-black w-5 text-center">${Number(item.kids) || 0}</span>
+              <button type="button" onclick="updateSiblingField('${side}', ${idx}, 'kids', ${(Number(item.kids) || 0) + 1})"
+                class="w-7 h-7 rounded-lg bg-zinc-900 dark:bg-pro-accent text-white font-black">＋</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadFromGoogleSheets(isAutoLoad = false) {
       const urlInput = document.getElementById('gas-webhook-url');
       const statusEl = document.getElementById('gas-sync-status');
       const loadBtn = document.getElementById('load-google-btn');
       const url = (urlInput ? urlInput.value : localStorage.getItem(GAS_URL_KEY) || '').trim();
 
       if (!url || !url.startsWith('https://script.google.com/')) {
-        switchTab('export');
-        showToast('請先在「3. 試算表匯出」貼上 Google Apps Script 網址');
-        if (statusEl) {
-          statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
-          statusEl.textContent = '請先貼上 Google Apps Script 網址（並確認已更新新版 doGet 並部署新版本）。';
+        if (!isAutoLoad) {
+          switchTab('export');
+          showToast('請先在「3. 試算表匯出」貼上 Google Apps Script 網址');
+          if (statusEl) {
+            statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
+            statusEl.textContent = '請先貼上 Google Apps Script 網址（並確認已更新新版 doGet 並部署新版本）。';
+          }
         }
         return;
       }
@@ -2674,9 +2546,11 @@ function doGet(e) {
       }
       if (statusEl) {
         statusEl.className = 'text-xs font-bold text-sky-600 dark:text-sky-400';
-        statusEl.textContent = '正在從 Google 試算表下載新人檔案...';
+        statusEl.textContent = isAutoLoad ? '正在自動同步 Google 試算表新人檔案...' : '正在從 Google 試算表下載新人檔案...';
       }
-      showToast('正在讀取 Google 試算表...');
+      if (!isAutoLoad) {
+        showToast('正在讀取 Google 試算表...');
+      }
 
       try {
         const data = await fetchJsonpFromGas(url);
@@ -2690,7 +2564,7 @@ function doGet(e) {
             statusEl.className = 'text-xs font-bold text-amber-600 dark:text-amber-400';
             statusEl.textContent = 'Google 試算表目前尚無任何新人紀錄。';
           }
-          showToast('試算表目前沒有資料');
+          if (!isAutoLoad) showToast('試算表目前沒有資料');
           return;
         }
 
@@ -2716,14 +2590,16 @@ function doGet(e) {
           statusEl.className = 'text-xs font-extrabold text-emerald-600 dark:text-emerald-400';
           statusEl.textContent = `已成功從 Google 試算表讀取 ${importedRecords.length} 份新人檔案！（讀取時間：${nowStr}）`;
         }
-        showToast(`已成功載入 ${importedRecords.length} 份新人檔案！`);
+        showToast(isAutoLoad ? `已自動同步 Google 試算表（共 ${importedRecords.length} 份新人檔案）` : `已成功載入 ${importedRecords.length} 份新人檔案！`);
       } catch (err) {
         console.error('Load from Google Sheets error:', err);
         if (statusEl) {
           statusEl.className = 'text-xs font-extrabold text-rose-600 dark:text-rose-400';
           statusEl.textContent = `${err.message || '讀取失敗：請按右上角「設定教學 / 程式碼」複製新版程式碼，並於「管理部署作業」部署為「新版本」。'}`;
         }
-        showToast('讀取失敗，請確認已部署新版本');
+        if (!isAutoLoad) {
+          showToast('讀取失敗，請確認已部署新版本');
+        }
       } finally {
         if (loadBtn) {
           loadBtn.disabled = false;
@@ -2801,16 +2677,16 @@ function doGet(e) {
         ``,
         `*膳食與車位*`,
         `• Lunch：${formatHybrid(rec.crewLunch)} | Dinner：${formatHybrid(rec.crewDinner)}`,
-        `• 交通：${formatHybrid(rec.transport)} | 車位：${formatHybrid(rec.parking)} | 早上的士：${formatHybrid(rec.morningTaxi)}`,
+        `• 交通：${formatHybrid(rec.transport)} | 車位：${formatHybrid(rec.parking)} | 早上的士：${formatHybrid(rec.morningTaxi)} | OT：${formatHybrid(rec.overtime)}`,
         ``,
         `*女家細節*`,
         `• 服裝：${formatHybrid(rec.brideAttire)} | 敬茶：${formatHybrid(rec.brideTeaSets)}`,
-        `• 家庭：${formatHybrid(rec.brideParentsStatus)} (父母間 ${rec.brideParentsRel}/10, 女與父母 ${rec.brideSelfParentsRel}/10)`,
+        `• 家庭：${formatHybrid(rec.brideParentsStatus)} (父母間 ${rec.brideParentsRel !== '' && rec.brideParentsRel !== null ? rec.brideParentsRel : '?'}/10, 女與父母 ${rec.brideSelfParentsRel !== '' && rec.brideSelfParentsRel !== null ? rec.brideSelfParentsRel : '?'}/10)`,
         `• 兄弟姊妹：${formatSiblingsSummary(rec, 'bride')} | 祖父母：${formatHybrid(rec.brideGrandparents)}`,
         ``,
         `*男家細節*`,
         `• 服裝：${formatHybrid(rec.groomAttire)} | 敬茶：${formatHybrid(rec.groomTeaSets)}`,
-        `• 家庭：${formatHybrid(rec.groomParentsStatus)} (父母間 ${rec.groomParentsRel}/10, 仔與父母 ${rec.groomSelfParentsRel}/10)`,
+        `• 家庭：${formatHybrid(rec.groomParentsStatus)} (父母間 ${rec.groomParentsRel !== '' && rec.groomParentsRel !== null ? rec.groomParentsRel : '?'}/10, 仔與父母 ${rec.groomSelfParentsRel !== '' && rec.groomSelfParentsRel !== null ? rec.groomSelfParentsRel : '?'}/10)`,
         `• 兄弟姊妹：${formatSiblingsSummary(rec, 'groom')} | 祖父母：${formatHybrid(rec.groomGrandparents)}`,
         rec.familyRemark ? `*家庭備註*：${rec.familyRemark}` : '',
         ``,
